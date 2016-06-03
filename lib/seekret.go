@@ -1,9 +1,9 @@
 package lib
 
 type Seekret struct {
-	ruleList []Rule
-	objectList []Object
-	secretList []Secret
+	ruleList      []Rule
+	objectList    []Object
+	secretList    []Secret
 	exceptionList []Exception
 }
 

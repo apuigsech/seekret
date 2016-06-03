@@ -2,11 +2,11 @@ package lib
 
 import (
 	"fmt"
-	"os"
 	"github.com/jasonmoo/ssh_config"
 	"github.com/libgit2/git2go"
-	"net/url"
 	"io/ioutil"
+	"net/url"
+	"os"
 	"regexp"
 )
 
@@ -14,21 +14,20 @@ var (
 	SourceTypeGit = &SourceGit{}
 )
 
-type SourceGit struct {}
-
+type SourceGit struct{}
 
 type SourceGitLoadOptions struct {
 	Count int
 }
 
-func prepareGitLoadOptions(o LoadOptions) (SourceGitLoadOptions) {
+func prepareGitLoadOptions(o LoadOptions) SourceGitLoadOptions {
 	opt := SourceGitLoadOptions{
 		Count: 0,
 	}
 
-	if count, ok := o["count"].(int) ; ok == true {
+	if count, ok := o["count"].(int); ok == true {
 		opt.Count = count
-	}	
+	}
 
 	return opt
 }
@@ -93,12 +92,12 @@ func credentialsCallback(gitUri string, username string, allowedTypes git.CredTy
 
 	fh, err := os.Open(sshConfigFile)
 	if err != nil {
-    	panic(err)
+		panic(err)
 	}
 
 	c, err := ssh_config.Parse(fh)
 	if err != nil {
-    	panic(err)
+		panic(err)
 	}
 
 	fh.Close()

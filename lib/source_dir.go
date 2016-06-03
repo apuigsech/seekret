@@ -11,24 +11,23 @@ var (
 	SourceTypeDir = &SourceDir{}
 )
 
-type SourceDir struct {}
-
+type SourceDir struct{}
 
 type SourceDirLoadOptions struct {
-	Hidden bool
+	Hidden    bool
 	Recursive bool
 }
 
-func prepareDirLoadOptions(o LoadOptions) (SourceDirLoadOptions) {
+func prepareDirLoadOptions(o LoadOptions) SourceDirLoadOptions {
 	opt := SourceDirLoadOptions{
-		Hidden: false,
+		Hidden:    false,
 		Recursive: true,
 	}
 
-	if hidden, ok := o["hidden"].(bool) ; ok == true {
+	if hidden, ok := o["hidden"].(bool); ok == true {
 		opt.Hidden = hidden
 	}
-	if recursive, ok := o["recursive"].(bool) ; ok == true {
+	if recursive, ok := o["recursive"].(bool); ok == true {
 		opt.Hidden = recursive
 	}
 

@@ -111,7 +111,7 @@ Options for Dir
 
 ``-r, --recursive``
 
-``-h, --hidden`
+``-h, --hidden``
 
 
 Examples

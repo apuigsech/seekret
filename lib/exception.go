@@ -59,7 +59,6 @@ func (s *Seekret) LoadExceptionsFromFile(file string) error {
 	return nil
 }
 
-
 func exceptionCheck(exceptionList []Exception, secret Secret) bool {
 	for _, e := range exceptionList {
 		match := true
@@ -79,7 +78,7 @@ func exceptionCheck(exceptionList []Exception, secret Secret) bool {
 
 		if match == true {
 			return true
-		}	
+		}
 	}
 
 	return false

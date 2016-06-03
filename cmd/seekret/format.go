@@ -5,7 +5,6 @@ import (
 	seekret "github.com/apuigsech/seekret/lib"
 )
 
-
 func FormatOutput(secretList []seekret.Secret, format string) string {
 	var out string
 
@@ -32,7 +31,6 @@ func formatOutputHuman(secretList []seekret.Secret) (string, error) {
 	}
 	return out, nil
 }
-
 
 // TODO: Implement
 func formatOutputJSON(secretList []seekret.Secret) (string, error) {

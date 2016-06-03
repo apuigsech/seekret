@@ -1,9 +1,9 @@
 package lib
 
 import (
-	"fmt"
 	"bufio"
 	"bytes"
+	"fmt"
 )
 
 func (s *Seekret) Inspect() {
@@ -28,10 +28,10 @@ func (s *Seekret) Inspect() {
 						}
 						if unmatch == false {
 							secret := Secret{
-								Object:    o,
-								Rule:      r,
-								Nline:     nLine,
-								Line:      line,
+								Object: o,
+								Rule:   r,
+								Nline:  nLine,
+								Line:   line,
 							}
 							secret.Exception = exceptionCheck(s.exceptionList, secret)
 							s.secretList = append(s.secretList, secret)

@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"github.com/urfave/cli"
 	seekret "github.com/apuigsech/seekret/lib"
+	"github.com/urfave/cli"
+	"os"
 )
 
 var s *seekret.Seekret
@@ -50,15 +50,15 @@ func main() {
 			Flags: []cli.Flag{
 				// TODO: To be implemented.
 				/*
-				cli.BoolFlag{
-					Name: "recursive, r",
-				},
-				cli.BoolFlag{
-					Name: "all, a",
-				},
-				cli.StringFlag{
-					Name: "branches, b",
-				},
+					cli.BoolFlag{
+						Name: "recursive, r",
+					},
+					cli.BoolFlag{
+						Name: "all, a",
+					},
+					cli.StringFlag{
+						Name: "branches, b",
+					},
 				*/
 				cli.IntFlag{
 					Name: "count, c",
@@ -88,7 +88,6 @@ func main() {
 	app.Run(os.Args)
 }
 
-
 func seekretBefore(c *cli.Context) error {
 	var err error
 
@@ -110,7 +109,7 @@ func seekretDir(c *cli.Context) error {
 	source := c.Args()[0]
 
 	options := map[string]interface{}{
-		"hidden": c.Bool("hidden"),
+		"hidden":    c.Bool("hidden"),
 		"recursive": c.Bool("recursive"),
 	}
 
