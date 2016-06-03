@@ -9,8 +9,31 @@ Go library and command line to seek for secrets on various sources.
 Command Line
 ************
 
-Synopsis
-========
+Description
+===========
+
+``seekret`` inspect different sources (files into a directory or git repositories)
+to seek for secrets. It can be used to prevent that secrets are published in exposed
+locations.
+
+
+
+Installing seekret
+==================
+
+``seekret`` can be directly installed by using go get.
+
+::
+
+    go get github.com/apuigsech/seekret/cmd/seekret
+
+
+
+Usage
+=====
+
+General Options
+~~~~~~~~~~~~~~~
 
 ::
 
@@ -39,31 +62,6 @@ Synopsis
        --version, -v        print the version
 
 
-
-Description
-===========
-
-``seekret`` inspect different sources (files into a directory or git repositories)
-to seek for secrets. It can be used to prevent that secrets are published in exposed
-locations.
-
-
-Installing seekret
-==================
-
-``seekret`` can be directly installed by using go get.
-
-::
-
-    go get github.com/apuigsech/seekret/cmd/seekret
-
-
-Options
-========
-
-General Options
-~~~~~~~~~~~~~~~
-
 ``-x, --exception``
 
 ``--rules``
@@ -74,15 +72,46 @@ General Options
 Options for Git
 ~~~~~~~~~~~~~~~
 
+::
+
+    NAME:
+       seekret git - seek for seecrets on a git repository.
+
+    USAGE:
+       seekret git [command options] [arguments...]
+
+    CATEGORY:
+       seek
+
+    OPTIONS:
+       --count value, -c value  (default: 0)
+   
+
 ``-c, --count``
 
 
 Options for Dir
 ~~~~~~~~~~~~~~~
 
+::
+
+    NAME:
+       seekret dir - seek for seecrets on a directory.  
+
+    USAGE:
+       seekret dir [command options] [arguments...] 
+
+    CATEGORY:
+       seek 
+
+    OPTIONS:
+       --recursive, -r  
+       --hidden
+
+
 ``-r, --recursive``
 
-``-h, --hidden``
+``-h, --hidden`
 
 
 Examples
