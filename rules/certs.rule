@@ -1,0 +1,8 @@
+generic:
+  match: .*-----BEGIN PRIVATE KEY-----.*
+
+pgp:
+  match: .*-----BEGIN PGP PRIVATE KEY BLOCK-----.*
+
+rsa:
+  match: .*-----BEGIN RSA PRIVATE KEY-----.*
