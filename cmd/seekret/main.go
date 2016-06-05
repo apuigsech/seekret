@@ -38,6 +38,10 @@ func main() {
 			Usage: "specify the output format.",
 			Value: "human",
 		},
+		cli.StringFlag{
+			Name: "known, k",
+			Usage:	"load known secrets from `FILE`.",
+		},
 	}
 
 	app.Commands = []cli.Command{
@@ -95,6 +99,8 @@ func seekretBefore(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
+	LoadKnownFromFile(s, c.String("known"))
 
 	err = s.LoadExceptionsFromFile(c.String("exception"))
 	if err != nil {

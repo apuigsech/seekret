@@ -133,6 +133,30 @@ Scan all files (including hidden) in a local folder::
     seekret dir --recursive --hidden /path/to/dir
 
 
+Hands-On
+========
+
+The repository seekret-secrets is prepare to test seekret, and can be used to
+perform the following hands-on examples:
+
+1. Inspect remote git repository.
+
+  seekret --rules $GOPATH/src/github.com/apuigsech/seekret/rules/ git https://github.com/apuigsech/seekret-secrets.git 
+
+2. Inspect local got repository.
+
+  git clone https://github.com/apuigsech/seekret-secrets.git /tmp/seekret-secrets
+  seekret --rules $GOPATH/src/github.com/apuigsech/seekret/rules/ git /tmp/seekret-secrets
+
+3. Inspect only the last 2 commits.
+
+  seekret --rules $GOPATH/src/github.com/apuigsech/seekret/rules/ git -c 2 /tmp/seekret-secrets
+
+4. Inspect with exceptions.
+
+  seekret --rules $GOPATH/src/github.com/apuigsech/seekret/rules/ -x /tmp/seekret-secrets/.exception_1 git /tmp/seekret-secrets
+
+
 *******
 Library
 *******

@@ -20,6 +20,12 @@ type Rule struct {
 	Unmatch []*regexp.Regexp
 }
 
+
+func (s *Seekret) AddRule(rule Rule) {
+	s.ruleList = append(s.ruleList, rule)
+}
+
+
 func (s *Seekret) LoadRulesFromFile(file string) error {
 	var ruleYamlMap map[string]ruleYaml
 
@@ -46,7 +52,7 @@ func (s *Seekret) LoadRulesFromFile(file string) error {
 		for _, e := range v.Unmatch {
 			rule.Unmatch = append(rule.Unmatch, regexp.MustCompile("(?i)"+e))
 		}
-		s.ruleList = append(s.ruleList, rule)
+		s.AddRule(rule)
 	}
 
 	return nil
