@@ -56,6 +56,8 @@ General Options
        --exception FILE, -x FILE    load exceptions from FILE.
        --rules PATH         PATH with rules. [$SEEKRET_RULES_PATH] 
        --format value, -f value specify the output format. (default: "human")
+       --known FILE, -k FILE  load known secrets from FILE.
+       --workers value, -w value  number of workers used for the inspection (default: 4)
        --help, -h           show help
        --version, -v        print the version
 
@@ -65,6 +67,10 @@ General Options
 ``--rules``
 
 ``-f, --format``
+
+``-k, --known``
+
+``-w, --workers`
 
 
 Options for Git
@@ -139,20 +145,20 @@ Hands-On
 The repository seekret-secrets is prepare to test seekret, and can be used to
 perform the following hands-on examples:
 
-1. Inspect remote git repository.
+1. Inspect remote git repository::
 
   seekret --rules $GOPATH/src/github.com/apuigsech/seekret/rules/ git https://github.com/apuigsech/seekret-secrets.git 
 
-2. Inspect local got repository.
+2. Inspect local got repository::
 
   git clone https://github.com/apuigsech/seekret-secrets.git /tmp/seekret-secrets
   seekret --rules $GOPATH/src/github.com/apuigsech/seekret/rules/ git /tmp/seekret-secrets
 
-3. Inspect only the last 2 commits.
+3. Inspect only the last 2 commits::
 
   seekret --rules $GOPATH/src/github.com/apuigsech/seekret/rules/ git -c 2 /tmp/seekret-secrets
 
-4. Inspect with exceptions.
+4. Inspect with exceptions::
 
   seekret --rules $GOPATH/src/github.com/apuigsech/seekret/rules/ -x /tmp/seekret-secrets/.exception_1 git /tmp/seekret-secrets
 

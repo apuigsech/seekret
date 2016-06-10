@@ -3,47 +3,81 @@ package lib
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 )
 
-func (s *Seekret) Inspect() {
-	for _, o := range s.objectList {
-		if len(o.Content) < MaxObjectContent {
-			for _, r := range s.ruleList {
-				x := bufio.NewScanner(bytes.NewReader(o.Content))
-				buf := []byte{}
-				x.Buffer(buf, MaxObjectContent)
+type workerJob struct {
+	object Object
+	ruleList []Rule
+	exceptionList []Exception
+}
 
-				nLine := 0
-				for x.Scan() {
-					nLine = nLine + 1
-					line := x.Text()
+type workerResult struct {
+	wid int
+	secretList []Secret
+}
 
-					if r.Match.MatchString(line) {
-						unmatch := false
-						for _, Unmatch := range r.Unmatch {
-							if Unmatch.MatchString(line) {
-								unmatch = true
-							}
-						}
-						if unmatch == false {
-							secret := Secret{
-								Object: o,
-								Rule:   r,
-								Nline:  nLine,
-								Line:   line,
-							}
-							secret.Exception = exceptionCheck(s.exceptionList, secret)
-							s.secretList = append(s.secretList, secret)
+func inspect_worker(id int, jobs <-chan workerJob, results chan<- workerResult) {
+	for job := range jobs {
+		result := workerResult{
+			wid: id,
+		}
+		for _,r := range job.ruleList {
+			x := bufio.NewScanner(bytes.NewReader(job.object.Content))
+			buf := []byte{}
+			x.Buffer(buf, MaxObjectContent)
+			x.Buffer(buf, MaxObjectContent)
 
+			nLine := 0
+			for x.Scan() {
+				nLine = nLine + 1
+				line := x.Text()
+			
+				if r.Match.MatchString(line) {
+					unmatch := false
+					for _, Unmatch := range r.Unmatch {
+						if Unmatch.MatchString(line) {
+							unmatch = true
 						}
 					}
-				}
-
-				if err := x.Err(); err != nil {
-					fmt.Println(err)
+					if unmatch == false {
+						secret := Secret{
+							Object: job.object,
+							Rule:   r,
+							Nline:  nLine,
+							Line:   line,
+						}
+						secret.Exception = exceptionCheck(job.exceptionList, secret)
+						result.secretList = append(result.secretList, secret)
+					}
 				}
 			}
 		}
+		results <- result
 	}
+}
+
+
+func (s *Seekret) Inspect(workers int) {	
+    jobs := make(chan workerJob)
+    results := make(chan workerResult)
+
+    for w := 1 ; w <= workers ; w++ {
+    	go inspect_worker(w, jobs, results)
+    }
+
+    go func() {
+    	for _, o := range s.objectList {
+    		jobs <- workerJob{
+    			object: o,
+    			ruleList: s.ruleList,
+    			exceptionList: s.exceptionList,
+    		}
+    	} 
+    	close(jobs)
+    }()
+
+    for _,_ = range s.objectList {
+    	result := <-results
+    	s.secretList = append(s.secretList, result.secretList...)
+    }
 }

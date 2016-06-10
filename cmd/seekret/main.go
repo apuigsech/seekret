@@ -42,6 +42,11 @@ func main() {
 			Name: "known, k",
 			Usage:	"load known secrets from `FILE`.",
 		},
+		cli.IntFlag{
+			Name: "workers, w",
+			Usage: "number of workers used for the inspection",
+			Value: 4,
+		},
 	}
 
 	app.Commands = []cli.Command{
@@ -143,7 +148,7 @@ func seekretGit(c *cli.Context) error {
 }
 
 func seekretAfter(c *cli.Context) error {
-	s.Inspect()
+	s.Inspect(c.Int("workers"))
 
 	fmt.Println(FormatOutput(s.ListSecrets(), c.String("format")))
 
