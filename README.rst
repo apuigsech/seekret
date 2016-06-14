@@ -147,27 +147,104 @@ perform the following hands-on examples:
 
 1. Inspect remote git repository::
 
-  seekret --rules $GOPATH/src/github.com/apuigsech/seekret/rules/ git https://github.com/apuigsech/seekret-secrets.git 
+    seekret --rules $GOPATH/src/github.com/apuigsech/seekret/rules/ git https://github.com/apuigsech/seekret-secrets.git 
 
 2. Inspect local got repository::
 
-  git clone https://github.com/apuigsech/seekret-secrets.git /tmp/seekret-secrets
-  seekret --rules $GOPATH/src/github.com/apuigsech/seekret/rules/ git /tmp/seekret-secrets
+    git clone https://github.com/apuigsech/seekret-secrets.git /tmp/seekret-secrets
+    seekret --rules $GOPATH/src/github.com/apuigsech/seekret/rules/ git /tmp/seekret-secrets
 
 3. Inspect only the last 2 commits::
 
-  seekret --rules $GOPATH/src/github.com/apuigsech/seekret/rules/ git -c 2 /tmp/seekret-secrets
+    seekret --rules $GOPATH/src/github.com/apuigsech/seekret/rules/ git -c 2 /tmp/seekret-secrets
 
 4. Inspect with exceptions::
 
-  seekret --rules $GOPATH/src/github.com/apuigsech/seekret/rules/ -x /tmp/seekret-secrets/.exception_1 git /tmp/seekret-secrets
+    seekret --rules $GOPATH/src/github.com/apuigsech/seekret/rules/ -x /tmp/seekret-secrets/.exception_1 git /tmp/seekret-secrets
 
 
 *******
 Library
 *******
 
-TBD
+Importing seekret Library
+=========================
+
+::
+
+    import seekret "github.com/apuigsech/seekret/lib"
+
+
+Init Seekret context
+====================
+
+::
+
+  s := seekret.NewSeekret()
+
+
+Loading Rules
+=============
+
+::
+
+    s.LoadRulesFromPath("/path/to/main/rues:/path/to/other/rules:/path/to/more/rules")
+
+::
+
+    s.LoadRulesFromDir("/path/to/rules")
+
+
+::
+
+    s.LoadRulesFromFile("/path/to/file.rule")
+
+
+Loading Objects
+===============
+
+::
+
+    opts := map[string]interface{} {
+      "hidden": true,
+      "recursive": false,
+    }
+    s.LoadObjects("dir", "/path/to/inspect", opts)
+
+
+::
+
+    opts := map[string]interface{} {
+      "count": 10,
+    }
+    s.LoadObjects("dir", "/repo/to/inspect", opts)
+
+
+Loading Exceptions
+==================
+
+::
+
+    s.LoadExceptionsFromFile("/path/to/exceptions/file")
+
+
+
+Inspect
+=======
+
+::
+    s.Inspect(5)
+
+
+
+Get Inspect Results
+===================
+
+::
+
+  secretsList := s.ListSecrets()
+
+
 
 *****
 Rules
