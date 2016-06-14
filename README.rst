@@ -70,7 +70,7 @@ General Options
 
 ``-k, --known``
 
-``-w, --workers`
+``-w, --workers``
 
 
 Options for Git

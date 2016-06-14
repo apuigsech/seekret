@@ -5,6 +5,7 @@ import (
 	"github.com/jasonmoo/ssh_config"
 	"github.com/libgit2/git2go"
 	"io/ioutil"
+	"path/filepath"
 	"net/url"
 	"os"
 	"regexp"
@@ -166,10 +167,16 @@ func openGitRepo(source string) (*git.Repository, error) {
 			return nil, err
 		}
 	} else {
-		// TODO: go up on fs to find the repo root.
-		repo, err = git.OpenRepository(source)
-		if err != nil {
-			return nil, err
+		for {
+			source, _ = filepath.Abs(source)
+			repo, err = git.OpenRepository(source)
+			if err == nil {
+				break
+			}
+			if source == "/" {
+				return nil,err
+			}
+			source = source + "/.."
 		}
 	}
 
