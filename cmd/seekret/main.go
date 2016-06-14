@@ -38,12 +38,19 @@ func main() {
 			Usage: "specify the output format.",
 			Value: "human",
 		},
+		// TODO: To be implemented.
+		/*
+			cli.StringFlag{
+				Name: "groupby, g",
+				Usage: "Group output by specific field",
+			},
+		*/
 		cli.StringFlag{
-			Name: "known, k",
-			Usage:	"load known secrets from `FILE`.",
+			Name:  "known, k",
+			Usage: "load known secrets from `FILE`.",
 		},
 		cli.IntFlag{
-			Name: "workers, w",
+			Name:  "workers, w",
 			Usage: "number of workers used for the inspection",
 			Value: 4,
 		},
@@ -52,7 +59,7 @@ func main() {
 	app.Commands = []cli.Command{
 		{
 			Name:     "git",
-			Usage:    "seek for seecrets on a git repository.",
+			Usage:    "seek for seecrets on a git repository",
 			Category: "seek",
 			Action:   seekretGit,
 
@@ -70,13 +77,15 @@ func main() {
 					},
 				*/
 				cli.IntFlag{
-					Name: "count, c",
+					Name:  "count, c",
+					Usage: "number of commits to inspect (0 = all)",
+					Value: 0,
 				},
 			},
 		},
 		{
 			Name:     "dir",
-			Usage:    "seek for seecrets on a directory.",
+			Usage:    "seek for seecrets on a directory",
 			Category: "seek",
 			Action:   seekretDir,
 
@@ -100,7 +109,12 @@ func main() {
 func seekretBefore(c *cli.Context) error {
 	var err error
 
-	err = s.LoadRulesFromPath(c.String("rules"))
+	rulesPath := c.String("rules")
+	if rulesPath == "" {
+		rulesPath = os.ExpandEnv("$GOPATH/src/github.com/apuigsech/seekret/rules")
+	}
+
+	err = s.LoadRulesFromPath(rulesPath)
 	if err != nil {
 		return err
 	}
@@ -141,6 +155,7 @@ func seekretGit(c *cli.Context) error {
 
 	err := s.LoadObjects(seekret.SourceTypeGit, source, options)
 	if err != nil {
+		fmt.Println("ERROR:", err)
 		return err
 	}
 
