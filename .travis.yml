@@ -4,5 +4,9 @@ go:
   - 1.5
   - tip
 
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libgit2-dev
+
 install:
   - go get github.com/apuigsech/seekret/cmd/seekret
