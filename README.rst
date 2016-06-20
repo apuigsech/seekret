@@ -180,7 +180,7 @@ Init Seekret context
 
 ::
 
-  s := seekret.NewSeekret()
+    s := seekret.NewSeekret()
 
 
 Loading Rules
@@ -233,6 +233,7 @@ Inspect
 =======
 
 ::
+
     s.Inspect(5)
 
 
@@ -242,7 +243,7 @@ Get Inspect Results
 
 ::
 
-  secretsList := s.ListSecrets()
+    secretsList := s.ListSecrets()
 
 
 

@@ -1,12 +1,12 @@
 package lib
 
 import (
+	"fmt"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path/filepath"
 	"regexp"
 	"strings"
-
-	"gopkg.in/yaml.v2"
 )
 
 type ruleYaml struct {
@@ -20,11 +20,9 @@ type Rule struct {
 	Unmatch []*regexp.Regexp
 }
 
-
 func (s *Seekret) AddRule(rule Rule) {
 	s.ruleList = append(s.ruleList, rule)
 }
-
 
 func (s *Seekret) LoadRulesFromFile(file string) error {
 	var ruleYamlMap map[string]ruleYaml
@@ -34,6 +32,8 @@ func (s *Seekret) LoadRulesFromFile(file string) error {
 	}
 
 	filename, _ := filepath.Abs(file)
+	x := filepath.Ext(filename)
+	fmt.Println("RULE: ", filename, x)
 	yamlData, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return err
@@ -64,7 +64,7 @@ func (s *Seekret) LoadRulesFromDir(dir string) error {
 		return err
 	}
 	for _, file := range fileList {
-		if strings.HasSuffix(file, ".rule") == true {
+		if strings.HasSuffix(file, ".rule") {
 			err := s.LoadRulesFromFile(file)
 			if err != nil {
 				return err

@@ -1,7 +1,6 @@
 package lib
 
 import (
-	//"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"regexp"
@@ -21,6 +20,10 @@ type Exception struct {
 	Object  *regexp.Regexp
 	Line    *int
 	Content *regexp.Regexp
+}
+
+func (s *Seekret) AddException(exception Exception) {
+	s.exceptionList = append(s.exceptionList, exception)
 }
 
 func (s *Seekret) LoadExceptionsFromFile(file string) error {
@@ -52,8 +55,7 @@ func (s *Seekret) LoadExceptionsFromFile(file string) error {
 		if v.Content != nil {
 			exception.Content = regexp.MustCompile("(?i)" + *v.Content)
 		}
-
-		s.exceptionList = append(s.exceptionList, exception)
+		s.AddException(exception)
 	}
 
 	return nil
@@ -63,20 +65,20 @@ func exceptionCheck(exceptionList []Exception, secret Secret) bool {
 	for _, e := range exceptionList {
 		match := true
 
-		if match == true && e.Rule != nil && *e.Rule != secret.Rule.Name {
+		if match && e.Rule != nil && *e.Rule != secret.Rule.Name {
 			match = false
 		}
-		if match == true && e.Line != nil && *e.Line != secret.Nline {
+		if match && e.Line != nil && *e.Line != secret.Nline {
 			match = false
 		}
-		if match == true && e.Object != nil && !(*e.Object).MatchString(secret.Object.Name) {
+		if match && e.Object != nil && !(*e.Object).MatchString(secret.Object.Name) {
 			match = false
 		}
-		if match == true && e.Content != nil && !(*e.Content).MatchString(secret.Line) {
+		if match && e.Content != nil && !(*e.Content).MatchString(secret.Line) {
 			match = false
 		}
 
-		if match == true {
+		if match {
 			return true
 		}
 	}

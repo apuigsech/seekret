@@ -5,9 +5,9 @@ import (
 	"github.com/jasonmoo/ssh_config"
 	"github.com/libgit2/git2go"
 	"io/ioutil"
-	"path/filepath"
 	"net/url"
 	"os"
+	"path/filepath"
 	"regexp"
 )
 
@@ -26,7 +26,7 @@ func prepareGitLoadOptions(o LoadOptions) SourceGitLoadOptions {
 		Count: 0,
 	}
 
-	if count, ok := o["count"].(int); ok == true {
+	if count, ok := o["count"].(int); ok {
 		opt.Count = count
 	}
 
@@ -174,7 +174,7 @@ func openGitRepo(source string) (*git.Repository, error) {
 				break
 			}
 			if source == "/" {
-				return nil,err
+				return nil, err
 			}
 			source = source + "/.."
 		}

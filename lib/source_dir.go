@@ -24,10 +24,10 @@ func prepareDirLoadOptions(o LoadOptions) SourceDirLoadOptions {
 		Recursive: true,
 	}
 
-	if hidden, ok := o["hidden"].(bool); ok == true {
+	if hidden, ok := o["hidden"].(bool); ok {
 		opt.Hidden = hidden
 	}
-	if recursive, ok := o["recursive"].(bool); ok == true {
+	if recursive, ok := o["recursive"].(bool); ok {
 		opt.Hidden = recursive
 	}
 
@@ -44,16 +44,16 @@ func (s *SourceDir) LoadObjects(source string, o LoadOptions) ([]Object, error) 
 	filepath.Walk(source, func(path string, fi os.FileInfo, err error) error {
 
 		if fi.IsDir() {
-			if strings.HasPrefix(filepath.Base(path), ".") == true && opt.Hidden == false {
+			if strings.HasPrefix(filepath.Base(path), ".") && !opt.Hidden {
 				return filepath.SkipDir
 			}
 
-			if firstPath == false && opt.Recursive == false {
+			if !firstPath && !opt.Recursive {
 				return filepath.SkipDir
 			}
 			firstPath = false
 		} else {
-			if strings.HasPrefix(filepath.Base(path), ".") == false || (strings.HasPrefix(filepath.Base(path), ".") == true && opt.Hidden == true) {
+			if !strings.HasPrefix(filepath.Base(path), ".") || (strings.HasPrefix(filepath.Base(path), ".")  && opt.Hidden) {
 				f, err := os.Open(path)
 				if err != nil {
 					return err

@@ -6,13 +6,13 @@ import (
 )
 
 type workerJob struct {
-	object Object
-	ruleList []Rule
+	object        Object
+	ruleList      []Rule
 	exceptionList []Exception
 }
 
 type workerResult struct {
-	wid int
+	wid        int
 	secretList []Secret
 }
 
@@ -21,7 +21,7 @@ func inspect_worker(id int, jobs <-chan workerJob, results chan<- workerResult) 
 		result := workerResult{
 			wid: id,
 		}
-		for _,r := range job.ruleList {
+		for _, r := range job.ruleList {
 			x := bufio.NewScanner(bytes.NewReader(job.object.Content))
 			buf := []byte{}
 			x.Buffer(buf, MaxObjectContent)
@@ -31,7 +31,7 @@ func inspect_worker(id int, jobs <-chan workerJob, results chan<- workerResult) 
 			for x.Scan() {
 				nLine = nLine + 1
 				line := x.Text()
-			
+
 				if r.Match.MatchString(line) {
 					unmatch := false
 					for _, Unmatch := range r.Unmatch {
@@ -39,7 +39,7 @@ func inspect_worker(id int, jobs <-chan workerJob, results chan<- workerResult) 
 							unmatch = true
 						}
 					}
-					if unmatch == false {
+					if !unmatch {
 						secret := Secret{
 							Object: job.object,
 							Rule:   r,
@@ -56,28 +56,27 @@ func inspect_worker(id int, jobs <-chan workerJob, results chan<- workerResult) 
 	}
 }
 
+func (s *Seekret) Inspect(workers int) {
+	jobs := make(chan workerJob)
+	results := make(chan workerResult)
 
-func (s *Seekret) Inspect(workers int) {	
-    jobs := make(chan workerJob)
-    results := make(chan workerResult)
+	for w := 1; w <= workers; w++ {
+		go inspect_worker(w, jobs, results)
+	}
 
-    for w := 1 ; w <= workers ; w++ {
-    	go inspect_worker(w, jobs, results)
-    }
+	go func() {
+		for _, o := range s.objectList {
+			jobs <- workerJob{
+				object:        o,
+				ruleList:      s.ruleList,
+				exceptionList: s.exceptionList,
+			}
+		}
+		close(jobs)
+	}()
 
-    go func() {
-    	for _, o := range s.objectList {
-    		jobs <- workerJob{
-    			object: o,
-    			ruleList: s.ruleList,
-    			exceptionList: s.exceptionList,
-    		}
-    	} 
-    	close(jobs)
-    }()
-
-    for _,_ = range s.objectList {
-    	result := <-results
-    	s.secretList = append(s.secretList, result.secretList...)
-    }
+	for i := 0; i < len(s.objectList); i++ {
+		result := <-results
+		s.secretList = append(s.secretList, result.secretList...)
+	}
 }
