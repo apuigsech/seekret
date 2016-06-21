@@ -1,3 +1,6 @@
+[![GoDoc](https://godoc.org/github.com/apuigsech/seekret/lib?status.svg)](https://godoc.org/github.com/apuigsech/seekret/lib)
+[![Build Status](https://travis-ci.org/apuigsech/seekret.svg?branch=master)](https://travis-ci.org/apuigsech/seekret)
+
 =======
 seekret
 =======
