@@ -310,7 +310,7 @@ Contains a regexp that should match the content.
 
 
 
-.. |Build Status| image:: hhttps://travis-ci.org/apuigsech/seekret.svg
+.. |Build Status| image:: https://travis-ci.org/apuigsech/seekret.svg
    :target: https://travis-ci.org/apuigsech/seekret
    :width: 88px
    :height: 20px
