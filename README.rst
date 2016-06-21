@@ -1,5 +1,4 @@
-[![GoDoc](https://godoc.org/github.com/apuigsech/seekret/lib?status.svg)](https://godoc.org/github.com/apuigsech/seekret/lib)
-[![Build Status](https://travis-ci.org/apuigsech/seekret.svg?branch=master)](https://travis-ci.org/apuigsech/seekret)
+|Build Status| |Documentation Status|
 
 =======
 seekret
@@ -308,3 +307,14 @@ Contains the line number into the object.
 
 ``content``
 Contains a regexp that should match the content.
+
+
+
+.. |Build Status| image:: hhttps://travis-ci.org/apuigsech/seekret.svg
+   :target: https://travis-ci.org/apuigsech/seekret
+   :width: 88px
+   :height: 20px
+.. |Documentation Status| image:: https://godoc.org/github.com/apuigsech/seekret/lib?status.svg
+   :target: https://godoc.org/github.com/apuigsech/seekret/lib
+   :width: 76px
+   :height: 20px
