@@ -69,7 +69,11 @@ func (s *SourceGit) LoadObjects(source string, o LoadOptions) ([]Object, error) 
 					return 0
 				}
 				o := Object{
-					Name:    fmt.Sprintf("%s:%s%s[%s]", commit.Id().String(), base, tentry.Name, tentry.Id.String()),
+					Name:    fmt.Sprintf("%s%s", base, tentry.Name),
+					Metadata: map[string]string{
+						"commit": commit.Id().String(),
+						"uniq-id": tentry.Id.String(),
+					},
 					Content: blob.Contents(),
 				}
 				objectList = append(objectList, o)

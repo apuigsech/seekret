@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path/filepath"
@@ -10,12 +9,14 @@ import (
 )
 
 type ruleYaml struct {
+	ObjectMatch string
 	Match   string
 	Unmatch []string
 }
 
 type Rule struct {
 	Name    string
+	ObjectMatch *regexp.Regexp
 	Match   *regexp.Regexp
 	Unmatch []*regexp.Regexp
 }
@@ -32,8 +33,8 @@ func (s *Seekret) LoadRulesFromFile(file string) error {
 	}
 
 	filename, _ := filepath.Abs(file)
-	x := filepath.Ext(filename)
-	fmt.Println("RULE: ", filename, x)
+//	x := filepath.Ext(filename)
+
 	yamlData, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return err
