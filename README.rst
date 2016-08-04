@@ -29,6 +29,13 @@ Installing seekret
     go get github.com/apuigsech/seekret/cmd/seekret
 
 
+The requirements for a success installation are:
+
+ * pkg-config
+ * golang >= 1.6
+ * libgit2 >= 2.23
+
+
 Usage
 =====
 
@@ -316,5 +323,5 @@ Contains a regexp that should match the content.
    :height: 20px
 .. |Documentation Status| image:: https://godoc.org/github.com/apuigsech/seekret/lib?status.svg
    :target: https://godoc.org/github.com/apuigsech/seekret/lib
-   :width: 76px
+   :width: 88px
    :height: 20px
