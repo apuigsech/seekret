@@ -22,6 +22,9 @@ func inspect_worker(id int, jobs <-chan workerJob, results chan<- workerResult) 
 			wid: id,
 		}
 		for _, r := range job.ruleList {
+			if r.Enabled == false {
+				continue
+			}
 			x := bufio.NewScanner(bytes.NewReader(job.object.Content))
 			buf := []byte{}
 

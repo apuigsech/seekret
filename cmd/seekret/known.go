@@ -27,7 +27,7 @@ func LoadKnownFromFile(s *seekret.Seekret, file string) error {
 			Name:  "known",
 			Match: regexp.MustCompile("(?i)" + scanner.Text()),
 		}
-		s.AddRule(rule)
+		s.AddRule(rule, true)
 	}
 
 	if err := scanner.Err(); err != nil {

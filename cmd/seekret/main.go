@@ -111,7 +111,7 @@ func seekretBefore(c *cli.Context) error {
 
 	rulesPath := c.String("rules")
 
-	err = s.LoadRulesFromPath(rulesPath)
+	err = s.LoadRulesFromPath(rulesPath, true)
 	if err != nil {
 		return err
 	}
