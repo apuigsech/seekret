@@ -110,9 +110,6 @@ func seekretBefore(c *cli.Context) error {
 	var err error
 
 	rulesPath := c.String("rules")
-	if rulesPath == "" {
-		rulesPath = os.ExpandEnv("$GOPATH/src/github.com/apuigsech/seekret/rules")
-	}
 
 	err = s.LoadRulesFromPath(rulesPath)
 	if err != nil {

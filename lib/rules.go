@@ -6,7 +6,10 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"os"
 )
+
+const DefaultRulesPath = "$GOPATH/src/github.com/apuigsech/seekret/rules"
 
 type ruleYaml struct {
 	ObjectMatch string
@@ -76,6 +79,9 @@ func (s *Seekret) LoadRulesFromDir(dir string) error {
 }
 
 func (s *Seekret) LoadRulesFromPath(path string) error {
+	if path == "" {
+		path = os.ExpandEnv(DefaultRulesPath)
+	}
 	dirList := strings.Split(path, ":")
 	for _, dir := range dirList {
 		err := s.LoadRulesFromDir(dir)
