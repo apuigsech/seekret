@@ -131,7 +131,11 @@ func seekretBefore(c *cli.Context) error {
 }
 
 func seekretDir(c *cli.Context) error {
-	source := c.Args()[0]
+	source := c.Args().Get(0)
+	if source == ""  {
+		cli.ShowSubcommandHelp(c)
+		return nil
+	}
 
 	options := map[string]interface{}{
 		"hidden":    c.Bool("hidden"),
@@ -147,7 +151,11 @@ func seekretDir(c *cli.Context) error {
 }
 
 func seekretGit(c *cli.Context) error {
-	source := c.Args()[0]
+	source := c.Args().Get(0)
+	if source == ""  {
+		cli.ShowSubcommandHelp(c)
+		return nil
+	}
 
 	options := map[string]interface{}{
 		"count": c.Int("count"),
@@ -155,7 +163,6 @@ func seekretGit(c *cli.Context) error {
 
 	err := s.LoadObjects(seekret.SourceTypeGit, source, options)
 	if err != nil {
-		fmt.Println("ERROR:", err)
 		return err
 	}
 

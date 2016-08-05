@@ -24,6 +24,8 @@ func inspect_worker(id int, jobs <-chan workerJob, results chan<- workerResult) 
 		for _, r := range job.ruleList {
 			x := bufio.NewScanner(bytes.NewReader(job.object.Content))
 			buf := []byte{}
+
+			// INFO: Remove the next two lines if using golang < 1.6
 			x.Buffer(buf, MaxObjectContent)
 			x.Buffer(buf, MaxObjectContent)
 

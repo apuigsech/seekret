@@ -132,7 +132,7 @@ func normalizeGitUri(source string) (string, bool) {
 	u := gitregexp.FindStringSubmatch(source)
 
 	if len(u) == 0 {
-		return gitUri, false
+		return source, false
 	}
 
 	var proto string
@@ -177,6 +177,11 @@ func openGitRepo(source string) (*git.Repository, error) {
 			if err == nil {
 				break
 			}
+			
+			if git.IsErrorClass(err, git.ErrClassOs) {
+				return nil, err
+			}
+			
 			if source == "/" {
 				return nil, err
 			}
