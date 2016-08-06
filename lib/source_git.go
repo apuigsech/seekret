@@ -154,40 +154,57 @@ func openGitRepo(source string) (*git.Repository, error) {
 	gitUri, remote := normalizeGitUri(source)
 
 	if remote {
-		tmpdir, err := ioutil.TempDir("", "seekret")
-		if err != nil {
-			return nil, err
-		}
-
-		repo, err = git.Clone(gitUri, tmpdir, &git.CloneOptions{
-			FetchOptions: &git.FetchOptions{
-				RemoteCallbacks: git.RemoteCallbacks{
-					CredentialsCallback:      credentialsCallback,
-					CertificateCheckCallback: certificateCheckCallback,
-				},
-			},
-		})
-		if err != nil {
-			return nil, err
-		}
+		return openGitRepoRemote(source)
 	} else {
-		for {
-			source, _ = filepath.Abs(source)
-			repo, err = git.OpenRepository(source)
-			if err == nil {
-				break
-			}
-			
-			if git.IsErrorClass(err, git.ErrClassOs) {
-				return nil, err
-			}
-			
-			if source == "/" {
-				return nil, err
-			}
-			source = source + "/.."
-		}
+		return openGitRepoLocal(source)
 	}
 
+	return repo, nil
+}
+
+func openGitRepoRemote(source string) (*git.Repository, error) {
+	var repo *git.Repository
+	var err error
+
+	tmpdir, err := ioutil.TempDir("", "seekret")
+	if err != nil {
+		return nil, err
+	}
+
+	repo, err = git.Clone(gitUri, tmpdir, &git.CloneOptions{
+		FetchOptions: &git.FetchOptions{
+			RemoteCallbacks: git.RemoteCallbacks{
+				CredentialsCallback:      credentialsCallback,
+				CertificateCheckCallback: certificateCheckCallback,
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return repo, nil
+}
+
+func openGitRepoLocal(source string) (*git.Repository, error) {
+	var repo *git.Repository
+	var err error
+
+	for {
+		source, _ = filepath.Abs(source)
+		repo, err = git.OpenRepository(source)
+		if err == nil {
+			break
+		}
+		
+		if git.IsErrorClass(err, git.ErrClassOs) {
+			return nil, err
+		}
+			
+		if source == "/" {
+			return nil, err
+		}
+		source = source + "/.."
+	}
 	return repo, nil
 }
