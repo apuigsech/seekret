@@ -149,12 +149,11 @@ func normalizeGitUri(source string) (string, bool) {
 
 func openGitRepo(source string) (*git.Repository, error) {
 	var repo *git.Repository
-	var err error
 
 	gitUri, remote := normalizeGitUri(source)
 
 	if remote {
-		return openGitRepoRemote(source)
+		return openGitRepoRemote(gitUri)
 	} else {
 		return openGitRepoLocal(source)
 	}
@@ -162,7 +161,7 @@ func openGitRepo(source string) (*git.Repository, error) {
 	return repo, nil
 }
 
-func openGitRepoRemote(source string) (*git.Repository, error) {
+func openGitRepoRemote(gitUri string) (*git.Repository, error) {
 	var repo *git.Repository
 	var err error
 
