@@ -77,9 +77,13 @@ func main() {
 					},
 				*/
 				cli.IntFlag{
-					Name:  "count, c",
-					Usage: "number of commits to inspect (0 = all)",
+					Name:  "commit, c",
+					Usage: "inspect commited files. Argument is the number of commits to inspect (0 = all)",
 					Value: 0,
+				},
+				cli.BoolFlag{
+					Name:  "staged, s",
+					Usage: "inspect staged files",
 				},
 			},
 		},
@@ -155,8 +159,20 @@ func seekretGit(c *cli.Context) error {
 	}
 
 	options := map[string]interface{}{
-		"count": c.Int("count"),
+		"commit": false,
+		"staged": false,
 	}
+
+	if c.IsSet("commit") {
+		options["commit"] = true
+		options["commitcount"] = c.Int("commit")
+	}
+
+	if c.IsSet("staged") {
+		options["staged"] = true
+	}
+
+	fmt.Println(options)
 
 	err := s.LoadObjects(seekret.SourceTypeGit, source, options)
 	if err != nil {

@@ -30,8 +30,16 @@ func prepareGitLoadOptions(o LoadOptions) SourceGitLoadOptions {
 		Staged: false,
 	}
 
-	if count, ok := o["count"].(int); ok {
-		opt.CommitCount = count
+	if commit, ok := o["commit"].(bool); ok {
+		opt.Commit = commit
+	}
+
+	if commitCount, ok := o["commit-count"].(int); ok {
+		opt.CommitCount = commitCount
+	}
+
+	if staged, ok := o["staged"].(bool); ok {
+		opt.Staged = staged
 	}
 
 	return opt
