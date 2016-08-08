@@ -18,16 +18,20 @@ var (
 type SourceGit struct{}
 
 type SourceGitLoadOptions struct {
-	Count int
+	Commit bool
+	CommitCount int
+	Staged bool
 }
 
 func prepareGitLoadOptions(o LoadOptions) SourceGitLoadOptions {
 	opt := SourceGitLoadOptions{
-		Count: 0,
+		Commit: true,
+		CommitCount: 0,
+		Staged: false,
 	}
 
 	if count, ok := o["count"].(int); ok {
-		opt.Count = count
+		opt.CommitCount = count
 	}
 
 	return opt
@@ -35,7 +39,6 @@ func prepareGitLoadOptions(o LoadOptions) SourceGitLoadOptions {
 
 func (s *SourceGit) LoadObjects(source string, o LoadOptions) ([]Object, error) {
 	var objectList []Object
-
 	opt := prepareGitLoadOptions(o)
 
 	repo, err := openGitRepo(source)
@@ -43,15 +46,46 @@ func (s *SourceGit) LoadObjects(source string, o LoadOptions) ([]Object, error) 
 		return nil, err
 	}
 
+	if opt.Commit {
+		objectListCommit,err := objectsFromCommit(repo, opt.CommitCount)
+		if err != nil {
+			return nil,err
+		}
+		objectList = append(objectList, objectListCommit...)
+	}
+
+	if opt.Staged {
+		objectListStaged,err := objectsFromStaged(repo)
+		if err != nil {
+			return nil,err
+		}
+		objectList = append(objectList, objectListStaged...)
+	}
+
+	return objectList, nil
+}
+
+func objectsFromCommit(repo *git.Repository, count int) ([]Object, error) {
+	var objectList []Object
+
 	walk, err := repo.Walk()
 	if err != nil {
 		return nil, err
 	}
 
-	if opt.Count > 0 {
-		walk.PushRange(fmt.Sprintf("HEAD~%d..HEAD", opt.Count))
+	if count > 0 {
+		err := walk.PushRange(fmt.Sprintf("HEAD~%d..HEAD", count))
+		if err != nil {
+			err := walk.PushHead()
+			if err != nil {
+				return nil,err
+			}
+		}
 	} else {
-		walk.PushHead()
+		err := walk.PushHead()
+		if err != nil {
+			return nil,err
+		}
 	}
 	walk.Sorting(git.SortTime)
 
@@ -91,6 +125,47 @@ func (s *SourceGit) LoadObjects(source string, o LoadOptions) ([]Object, error) 
 
 	return objectList, nil
 }
+
+
+func objectsFromStaged(repo *git.Repository) ([]Object, error) {
+	var objectList []Object
+
+	index, err := repo.Index()
+	if err != nil {
+		return nil,err
+	}
+
+	for i := 0; i < int(index.EntryCount()); i++ {
+
+		entry, err := index.EntryByIndex(uint(i))
+		if err != nil {
+			return nil,err
+		}
+
+		status, err := repo.StatusFile(entry.Path)
+		if err != nil {
+			return nil,err
+		}
+
+		if status != git.StatusCurrent {
+			blob, err := repo.LookupBlob(entry.Id)
+			if err != nil {
+				return nil,err
+			}
+			o := Object {
+				Name: entry.Path,
+				Metadata: map[string]string {
+					"status": "test",
+				},
+				Content: blob.Contents(),
+			}
+			objectList = append(objectList, o)
+		}
+	}
+
+	return objectList,nil
+}
+
 
 func credentialsCallback(gitUri string, username string, allowedTypes git.CredType) (git.ErrorCode, *git.Cred) {
 	sshConfigFile := os.ExpandEnv("$HOME/.ssh/config")

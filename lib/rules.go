@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-const DefaultRulesPath = "$GOPATH/src/github.com/apuigsech/seekret/rules"
+const DefaultRulesDir = "$GOPATH/src/github.com/apuigsech/seekret/rules"
 
 type ruleYaml struct {
 	ObjectMatch string
@@ -24,6 +24,10 @@ type Rule struct {
 	ObjectMatch *regexp.Regexp
 	Match   *regexp.Regexp
 	Unmatch []*regexp.Regexp
+}
+
+func (s *Seekret) ListRules() []Rule {
+	return s.ruleList
 }
 
 func (s *Seekret) AddRule(rule Rule, enabled bool) {
@@ -70,6 +74,16 @@ func (s *Seekret) LoadRulesFromFile(file string, defaulEnabled bool) error {
 }
 
 func (s *Seekret) LoadRulesFromDir(dir string, defaulEnabled bool) error {
+	fi, err := os.Stat(dir)
+	if err != nil {
+		return err
+	}
+
+	if !fi.IsDir() {
+		err := fmt.Errorf("%s is not a directory", dir)
+		return err
+	}
+
 	fileList, err := filepath.Glob(dir + "/*")
 	if err != nil {
 		return err
@@ -87,7 +101,7 @@ func (s *Seekret) LoadRulesFromDir(dir string, defaulEnabled bool) error {
 
 func (s *Seekret) LoadRulesFromPath(path string, defaulEnabled bool) error {
 	if path == "" {
-		path = os.ExpandEnv(DefaultRulesPath)
+		path = os.ExpandEnv(DefaultRulesDir)
 	}
 	dirList := strings.Split(path, ":")
 	for _, dir := range dirList {
@@ -97,6 +111,14 @@ func (s *Seekret) LoadRulesFromPath(path string, defaulEnabled bool) error {
 		}
 	}
 	return nil
+}
+
+func (s *Seekret) DefaultRulesPath() string {
+	rulesPath := os.Getenv("SEEKRET_RULES_PATH")
+	if rulesPath == "" {
+		rulesPath = os.ExpandEnv(DefaultRulesDir)
+	}
+	return rulesPath
 }
 
 func (s *Seekret) EnableRule(name string) {
@@ -109,7 +131,6 @@ func (s *Seekret) DisableRule(name string) {
 
 func setRuleEnabled(ruleList []Rule, name string, enabled bool) {
 	for i, r := range ruleList {
-		fmt.Println(r.Name, name)
 		if r.Name == name {
 			ruleList[i].Enabled = enabled
 		}
