@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/url"
 	"os"
-	"path/filepath"
 	"regexp"
 )
 
@@ -272,21 +271,10 @@ func openGitRepoLocal(source string) (*git.Repository, error) {
 	var repo *git.Repository
 	var err error
 
-	for {
-		source, _ = filepath.Abs(source)
-		repo, err = git.OpenRepository(source)
-		if err == nil {
-			break
-		}
-		
-		if git.IsErrorClass(err, git.ErrClassOs) {
-			return nil, err
-		}
-			
-		if source == "/" {
-			return nil, err
-		}
-		source = source + "/.."
+	repo, err = git.OpenRepositoryExtended(source, git.RepositoryOpenCrossFs, "")
+	if  err != nil{
+		return nil, err
 	}
+
 	return repo, nil
 }
