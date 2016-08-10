@@ -10,7 +10,6 @@ import (
 	"os"
 )
 
-const DefaultRulesDir = "$GOPATH/src/github.com/apuigsech/seekret/rules"
 
 type ruleYaml struct {
 	ObjectMatch string
@@ -24,6 +23,16 @@ type Rule struct {
 	ObjectMatch *regexp.Regexp
 	Match   *regexp.Regexp
 	Unmatch []*regexp.Regexp
+}
+
+const DefaultRulesDir = "$GOPATH/src/github.com/apuigsech/seekret/rules"
+
+func DefaultRulesPath() string {
+	rulesPath := os.Getenv("SEEKRET_RULES_PATH")
+	if rulesPath == "" {
+		rulesPath = os.ExpandEnv(DefaultRulesDir)
+	}
+	return rulesPath
 }
 
 func (s *Seekret) ListRules() []Rule {
@@ -113,26 +122,26 @@ func (s *Seekret) LoadRulesFromPath(path string, defaulEnabled bool) error {
 	return nil
 }
 
-func (s *Seekret) DefaultRulesPath() string {
-	rulesPath := os.Getenv("SEEKRET_RULES_PATH")
-	if rulesPath == "" {
-		rulesPath = os.ExpandEnv(DefaultRulesDir)
-	}
-	return rulesPath
+func (s *Seekret) EnableRule(name string) (error) {
+	return setRuleEnabled(s.ruleList, name, true)
 }
 
-func (s *Seekret) EnableRule(name string) {
-	setRuleEnabled(s.ruleList, name, true)
+func (s *Seekret) DisableRule(name string) (error) {
+	return setRuleEnabled(s.ruleList, name, false)
 }
 
-func (s *Seekret) DisableRule(name string) {
-	setRuleEnabled(s.ruleList, name, false)
-}
-
-func setRuleEnabled(ruleList []Rule, name string, enabled bool) {
+func setRuleEnabled(ruleList []Rule, name string, enabled bool) (error) {
+	found := false
 	for i, r := range ruleList {
 		if r.Name == name {
+			found = true
 			ruleList[i].Enabled = enabled
 		}
 	}
+	if !found {
+		err := fmt.Errorf("%s rule not found", name)
+		return err
+	}
+
+	return nil
 }
