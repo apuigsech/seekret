@@ -111,12 +111,12 @@ func objectsFromCommit(repo *git.Repository, count int) ([]Object, error) {
 				}
 				o := Object{
 					Name:    fmt.Sprintf("%s%s", base, tentry.Name),
-					Metadata: map[string]string{
-						"commit": commit.Id().String(),
-						"uniq-id": tentry.Id.String(),
-					},
 					Content: blob.Contents(),
 				}
+				o.SetMetadata("commit", commit.Id().String(), MetadataAttributes{})
+				o.SetMetadata("uniq-id", tentry.Id.String(), MetadataAttributes{
+					PrimaryKey: true,
+				})
 				objectList = append(objectList, o)
 			}
 
@@ -161,11 +161,10 @@ func objectsFromStaged(repo *git.Repository) ([]Object, error) {
 			}
 			o := Object {
 				Name: entry.Path,
-				Metadata: map[string]string {
-					"status": "test",
-				},
 				Content: blob.Contents(),
 			}
+			// TODO: Type of staged.
+			o.SetMetadata("status", "staged", MetadataAttributes{})
 			objectList = append(objectList, o)
 		}
 	}
@@ -268,10 +267,7 @@ func openGitRepoRemote(gitUri string) (*git.Repository, error) {
 }
 
 func openGitRepoLocal(source string) (*git.Repository, error) {
-	var repo *git.Repository
-	var err error
-
-	repo, err = git.OpenRepositoryExtended(source, git.RepositoryOpenCrossFs, "")
+	repo, err := git.OpenRepositoryExtended(source, git.RepositoryOpenCrossFs, "")
 	if  err != nil{
 		return nil, err
 	}

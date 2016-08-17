@@ -172,8 +172,6 @@ func seekretGit(c *cli.Context) error {
 		options["staged"] = true
 	}
 
-	fmt.Println(options)
-
 	err := s.LoadObjects(seekret.SourceTypeGit, source, options)
 	if err != nil {
 		return err

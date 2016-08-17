@@ -58,6 +58,7 @@ func (s *SourceDir) LoadObjects(source string, o LoadOptions) ([]Object, error) 
 				if err != nil {
 					return err
 				}
+				
 				content, err := ioutil.ReadAll(f)
 				if err != nil {
 					return err
