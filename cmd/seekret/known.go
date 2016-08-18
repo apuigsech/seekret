@@ -3,9 +3,9 @@ package main
 import (
 	"bufio"
 	"github.com/apuigsech/seekret"
+	"github.com/apuigsech/seekret/models"
 	"os"
 	"path/filepath"
-	"regexp"
 )
 
 func LoadKnownFromFile(s *seekret.Seekret, file string) error {
@@ -23,11 +23,11 @@ func LoadKnownFromFile(s *seekret.Seekret, file string) error {
 
 	scanner := bufio.NewScanner(fh)
 	for scanner.Scan() {
-		rule := seekret.Rule{
-			Name:  "known",
-			Match: regexp.MustCompile("(?i)" + scanner.Text()),
+		rule,err  := models.NewRule("known", scanner.Text())
+		if err != nil {
+			return err
 		}
-		s.AddRule(rule, true)
+		s.AddRule(*rule, true)
 	}
 
 	if err := scanner.Err(); err != nil {
