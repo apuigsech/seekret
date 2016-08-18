@@ -109,15 +109,14 @@ func objectsFromCommit(repo *git.Repository, count int) ([]Object, error) {
 				if err != nil {
 					return 0
 				}
-				o := Object{
-					Name:    fmt.Sprintf("%s%s", base, tentry.Name),
-					Content: blob.Contents(),
-				}
+
+				o := NewObject(fmt.Sprintf("%s%s", base, tentry.Name),  blob.Contents())
+
 				o.SetMetadata("commit", commit.Id().String(), MetadataAttributes{})
 				o.SetMetadata("uniq-id", tentry.Id.String(), MetadataAttributes{
 					PrimaryKey: true,
 				})
-				objectList = append(objectList, o)
+				objectList = append(objectList, *o)
 			}
 
 			return 0
@@ -159,13 +158,12 @@ func objectsFromStaged(repo *git.Repository) ([]Object, error) {
 			if err != nil {
 				return nil,err
 			}
-			o := Object {
-				Name: entry.Path,
-				Content: blob.Contents(),
-			}
+
+			o := NewObject(entry.Path,  blob.Contents())
+
 			// TODO: Type of staged.
 			o.SetMetadata("status", "staged", MetadataAttributes{})
-			objectList = append(objectList, o)
+			objectList = append(objectList, *o)
 		}
 	}
 

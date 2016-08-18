@@ -64,12 +64,9 @@ func (s *SourceDir) LoadObjects(source string, o LoadOptions) ([]Object, error) 
 					return err
 				}
 
-				o := Object{
-					Name:    path,
-					Content: content,
-				}
-
-				objectList = append(objectList, o)
+				o := NewObject(path, content)
+		
+				objectList = append(objectList, *o)
 			}
 		}
 

@@ -21,6 +21,7 @@ func inspect_worker(id int, jobs <-chan workerJob, results chan<- workerResult) 
 		result := workerResult{
 			wid: id,
 		}
+
 		for _, r := range job.ruleList {
 			if r.Enabled == false {
 				continue
@@ -29,8 +30,8 @@ func inspect_worker(id int, jobs <-chan workerJob, results chan<- workerResult) 
 			buf := []byte{}
 
 			// INFO: Remove the next two lines if using golang < 1.6
-			x.Buffer(buf, MaxObjectContent)
-			x.Buffer(buf, MaxObjectContent)
+			x.Buffer(buf, MaxObjectContentLen)
+			x.Buffer(buf, MaxObjectContentLen)
 
 			nLine := 0
 			for x.Scan() {
