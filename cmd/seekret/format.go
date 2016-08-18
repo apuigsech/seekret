@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	seekret "github.com/apuigsech/seekret/lib"
+	"github.com/apuigsech/seekret"
 )
 
 func FormatOutput(secretList []seekret.Secret, format string) string {

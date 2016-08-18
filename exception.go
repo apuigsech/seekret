@@ -1,4 +1,4 @@
-package lib
+package seekret
 
 import (
 	"io/ioutil"

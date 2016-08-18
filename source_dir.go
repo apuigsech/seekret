@@ -1,10 +1,11 @@
-package lib
+package seekret
 
 import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+	"github.com/apuigsech/seekret/models"
 )
 
 var (
@@ -34,8 +35,8 @@ func prepareDirLoadOptions(o LoadOptions) SourceDirLoadOptions {
 	return opt
 }
 
-func (s *SourceDir) LoadObjects(source string, o LoadOptions) ([]Object, error) {
-	var objectList []Object
+func (s *SourceDir) LoadObjects(source string, o LoadOptions) ([]models.Object, error) {
+	var objectList []models.Object
 
 	opt := prepareDirLoadOptions(o)
 
@@ -64,7 +65,7 @@ func (s *SourceDir) LoadObjects(source string, o LoadOptions) ([]Object, error) 
 					return err
 				}
 
-				o := NewObject(path, content)
+				o := models.NewObject(path, content)
 		
 				objectList = append(objectList, *o)
 			}

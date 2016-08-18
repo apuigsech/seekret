@@ -1,28 +1,39 @@
-package lib
+package seekret
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v2"
+	"os"
 	"io/ioutil"
 	"path/filepath"
-	"regexp"
 	"strings"
-	"os"
+	"github.com/apuigsech/seekret/models"
+	"gopkg.in/yaml.v2"
 )
 
+type Seekret struct {
+	ruleList      []models.Rule
+	objectList    []models.Object
+	secretList    []Secret
+	exceptionList []Exception
+}
+
+func NewSeekret() *Seekret {
+	s := &Seekret{}
+	return s
+}
+
+func (s *Seekret)GroupObjectsByMetadata(k string) (map[string][]models.Object) {
+	return models.GroupObjectsByMetadata(s.objectList, k)
+}
+
+func (s *Seekret)GroupObjectsByPrimaryKeyHash() (map[string][]models.Object) {
+	return models.GroupObjectsByPrimaryKeyHash(s.objectList)
+}
 
 type ruleYaml struct {
 	ObjectMatch string
 	Match   string
 	Unmatch []string
-}
-
-type Rule struct {
-	Enabled bool
-	Name    string
-	ObjectMatch *regexp.Regexp
-	Match   *regexp.Regexp
-	Unmatch []*regexp.Regexp
 }
 
 const DefaultRulesDir = "$GOPATH/src/github.com/apuigsech/seekret/rules"
@@ -35,12 +46,12 @@ func DefaultRulesPath() string {
 	return rulesPath
 }
 
-func (s *Seekret) ListRules() []Rule {
-	return s.ruleList
-}
 
-func (s *Seekret) AddRule(rule Rule, enabled bool) {
-	rule.Enabled = enabled
+
+func (s *Seekret) AddRule(rule models.Rule, enabled bool) {
+	if enabled {
+		rule.Enable()
+	}
 	s.ruleList = append(s.ruleList, rule)
 }
 
@@ -69,14 +80,15 @@ func (s *Seekret) LoadRulesFromFile(file string, defaulEnabled bool) error {
 	}
 
 	for k, v := range ruleYamlMap {
-		rule := Rule{
-			Name:  ruleBase + "." + k,
-			Match: regexp.MustCompile("(?i)" + v.Match),
+		rule, err := models.NewRule(ruleBase + "." + k, v.Match)
+		if err != nil {
+			return err
 		}
+		
 		for _, e := range v.Unmatch {
-			rule.Unmatch = append(rule.Unmatch, regexp.MustCompile("(?i)"+e))
+			rule.AddUnmatch(e)
 		}
-		s.AddRule(rule, defaulEnabled)
+		s.AddRule(*rule, defaulEnabled)
 	}
 
 	return nil
@@ -122,6 +134,12 @@ func (s *Seekret) LoadRulesFromPath(path string, defaulEnabled bool) error {
 	return nil
 }
 
+
+func (s *Seekret) ListRules() []models.Rule {
+	return s.ruleList
+}
+
+
 func (s *Seekret) EnableRule(name string) (error) {
 	return setRuleEnabled(s.ruleList, name, true)
 }
@@ -130,7 +148,7 @@ func (s *Seekret) DisableRule(name string) (error) {
 	return setRuleEnabled(s.ruleList, name, false)
 }
 
-func setRuleEnabled(ruleList []Rule, name string, enabled bool) (error) {
+func setRuleEnabled(ruleList []models.Rule, name string, enabled bool) (error) {
 	found := false
 	for i, r := range ruleList {
 		if r.Name == name {

@@ -1,4 +1,4 @@
-package lib
+package seekret
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"github.com/apuigsech/seekret/models"
 )
 
 var (
@@ -44,8 +45,8 @@ func prepareGitLoadOptions(o LoadOptions) SourceGitLoadOptions {
 	return opt
 }
 
-func (s *SourceGit) LoadObjects(source string, o LoadOptions) ([]Object, error) {
-	var objectList []Object
+func (s *SourceGit) LoadObjects(source string, o LoadOptions) ([]models.Object, error) {
+	var objectList []models.Object
 	opt := prepareGitLoadOptions(o)
 
 	repo, err := openGitRepo(source)
@@ -72,8 +73,8 @@ func (s *SourceGit) LoadObjects(source string, o LoadOptions) ([]Object, error) 
 	return objectList, nil
 }
 
-func objectsFromCommit(repo *git.Repository, count int) ([]Object, error) {
-	var objectList []Object
+func objectsFromCommit(repo *git.Repository, count int) ([]models.Object, error) {
+	var objectList []models.Object
 
 	walk, err := repo.Walk()
 	if err != nil {
@@ -110,10 +111,10 @@ func objectsFromCommit(repo *git.Repository, count int) ([]Object, error) {
 					return 0
 				}
 
-				o := NewObject(fmt.Sprintf("%s%s", base, tentry.Name),  blob.Contents())
+				o := models.NewObject(fmt.Sprintf("%s%s", base, tentry.Name),  blob.Contents())
 
-				o.SetMetadata("commit", commit.Id().String(), MetadataAttributes{})
-				o.SetMetadata("uniq-id", tentry.Id.String(), MetadataAttributes{
+				o.SetMetadata("commit", commit.Id().String(), models.MetadataAttributes{})
+				o.SetMetadata("uniq-id", tentry.Id.String(), models.MetadataAttributes{
 					PrimaryKey: true,
 				})
 				objectList = append(objectList, *o)
@@ -133,8 +134,8 @@ func objectsFromCommit(repo *git.Repository, count int) ([]Object, error) {
 }
 
 
-func objectsFromStaged(repo *git.Repository) ([]Object, error) {
-	var objectList []Object
+func objectsFromStaged(repo *git.Repository) ([]models.Object, error) {
+	var objectList []models.Object
 
 	index, err := repo.Index()
 	if err != nil {
@@ -159,10 +160,10 @@ func objectsFromStaged(repo *git.Repository) ([]Object, error) {
 				return nil,err
 			}
 
-			o := NewObject(entry.Path,  blob.Contents())
+			o := models.NewObject(entry.Path,  blob.Contents())
 
 			// TODO: Type of staged.
-			o.SetMetadata("status", "staged", MetadataAttributes{})
+			o.SetMetadata("status", "staged", models.MetadataAttributes{})
 			objectList = append(objectList, *o)
 		}
 	}

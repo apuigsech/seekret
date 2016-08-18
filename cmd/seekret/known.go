@@ -2,7 +2,7 @@ package main
 
 import (
 	"bufio"
-	seekret "github.com/apuigsech/seekret/lib"
+	"github.com/apuigsech/seekret"
 	"os"
 	"path/filepath"
 	"regexp"

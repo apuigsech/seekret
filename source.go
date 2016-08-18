@@ -1,9 +1,13 @@
-package lib
+package seekret
+
+import (
+	"github.com/apuigsech/seekret/models"
+)
 
 type LoadOptions map[string]interface{}
 
 type SourceType interface {
-	LoadObjects(source string, opt LoadOptions) ([]Object, error)
+	LoadObjects(source string, opt LoadOptions) ([]models.Object, error)
 }
 
 func (s *Seekret) LoadObjects(st SourceType, source string, opt LoadOptions) error {

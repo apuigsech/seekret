@@ -1,11 +1,9 @@
-package lib
+package models
 
 import (
-	"fmt"
 	"bytes"
 	"testing"
 )
-
 
 type NewObjectSample struct {
 	name string
@@ -199,8 +197,6 @@ func testPrimaryKeyHashSample(ts PrimaryKeyHashSample) bool {
 	}
 
 	h := o.GetPrimaryKeyHash()
-
-	fmt.Printf("%#v\n", h)
 
 	ok := (bytes.Equal(ts.primaryKeyHash, h))
 

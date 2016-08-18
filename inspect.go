@@ -1,13 +1,14 @@
-package lib
+package seekret
 
 import (
 	"bufio"
 	"bytes"
+	"github.com/apuigsech/seekret/models"
 )
 
 type workerJob struct {
-	object        Object
-	ruleList      []Rule
+	object        models.Object
+	ruleList      []models.Rule
 	exceptionList []Exception
 }
 
@@ -30,8 +31,7 @@ func inspect_worker(id int, jobs <-chan workerJob, results chan<- workerResult) 
 			buf := []byte{}
 
 			// INFO: Remove the next two lines if using golang < 1.6
-			x.Buffer(buf, MaxObjectContentLen)
-			x.Buffer(buf, MaxObjectContentLen)
+			x.Buffer(buf, models.MaxObjectContentLen)
 
 			nLine := 0
 			for x.Scan() {

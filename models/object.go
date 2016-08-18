@@ -1,4 +1,4 @@
-package lib
+package models
 
 import (
 	"fmt"
@@ -119,8 +119,6 @@ func GroupObjectsByMetadata(objects []Object, k string) (map[string][]Object) {
 	}
 	return objectGroups
 }
-
-
 
 func GroupObjectsByPrimaryKeyHash(objects []Object) (map[string][]Object) {
 	objectGroups := make(map[string][]Object)
