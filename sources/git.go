@@ -1,4 +1,4 @@
-package seekret
+package sources
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"github.com/apuigsech/seekret"
 	"github.com/apuigsech/seekret/models"
 )
 
@@ -23,7 +24,7 @@ type SourceGitLoadOptions struct {
 	Staged bool
 }
 
-func prepareGitLoadOptions(o LoadOptions) SourceGitLoadOptions {
+func prepareGitLoadOptions(o seekret.LoadOptions) SourceGitLoadOptions {
 	opt := SourceGitLoadOptions{
 		Commit: true,
 		CommitCount: 0,
@@ -45,7 +46,7 @@ func prepareGitLoadOptions(o LoadOptions) SourceGitLoadOptions {
 	return opt
 }
 
-func (s *SourceGit) LoadObjects(source string, o LoadOptions) ([]models.Object, error) {
+func (s *SourceGit) LoadObjects(source string, o seekret.LoadOptions) ([]models.Object, error) {
 	var objectList []models.Object
 	opt := prepareGitLoadOptions(o)
 

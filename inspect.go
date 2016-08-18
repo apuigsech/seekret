@@ -9,12 +9,12 @@ import (
 type workerJob struct {
 	object        models.Object
 	ruleList      []models.Rule
-	exceptionList []Exception
+	exceptionList []models.Exception
 }
 
 type workerResult struct {
 	wid        int
-	secretList []Secret
+	secretList []models.Secret
 }
 
 func inspect_worker(id int, jobs <-chan workerJob, results chan<- workerResult) {
@@ -46,14 +46,10 @@ func inspect_worker(id int, jobs <-chan workerJob, results chan<- workerResult) 
 						}
 					}
 					if !unmatch {
-						secret := Secret{
-							Object: job.object,
-							Rule:   r,
-							Nline:  nLine,
-							Line:   line,
-						}
-						secret.Exception = exceptionCheck(job.exceptionList, secret)
-						result.secretList = append(result.secretList, secret)
+						secret := models.NewSecret(&job.object, &r, nLine, line)
+
+						secret.Exception = exceptionCheck(job.exceptionList, *secret)
+						result.secretList = append(result.secretList, *secret)
 					}
 				}
 			}

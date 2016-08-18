@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/apuigsech/seekret"
+	"github.com/apuigsech/seekret/models"
 )
 
-func FormatOutput(secretList []seekret.Secret, format string) string {
+func FormatOutput(secretList []models.Secret, format string) string {
 	var out string
 
 	switch format {
@@ -24,7 +24,7 @@ func FormatOutput(secretList []seekret.Secret, format string) string {
 	return out
 }
 
-func formatOutputHuman(secretList []seekret.Secret) (string, error) {
+func formatOutputHuman(secretList []models.Secret) (string, error) {
 	var out string
 	for _, s := range secretList {
 		out = out + fmt.Sprintf("%s\n\t%d: [%s] %s %s\n", s.Object.Name, s.Nline, s.Rule.Name, s.Line, s.Exception)
@@ -33,14 +33,14 @@ func formatOutputHuman(secretList []seekret.Secret) (string, error) {
 }
 
 // TODO: Implement
-func formatOutputJSON(secretList []seekret.Secret) (string, error) {
+func formatOutputJSON(secretList []models.Secret) (string, error) {
 	return "Not implemented", nil
 }
 
-func formatOutputXML(secretList []seekret.Secret) (string, error) {
+func formatOutputXML(secretList []models.Secret) (string, error) {
 	return "Not implemented", nil
 }
 
-func formatOutputCSV(secretList []seekret.Secret) (string, error) {
+func formatOutputCSV(secretList []models.Secret) (string, error) {
 	return "Not implemented", nil
 }

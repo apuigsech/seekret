@@ -1,10 +1,11 @@
-package seekret
+package sources
 
 import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+	"github.com/apuigsech/seekret"
 	"github.com/apuigsech/seekret/models"
 )
 
@@ -19,7 +20,7 @@ type SourceDirLoadOptions struct {
 	Recursive bool
 }
 
-func prepareDirLoadOptions(o LoadOptions) SourceDirLoadOptions {
+func prepareDirLoadOptions(o seekret.LoadOptions) SourceDirLoadOptions {
 	opt := SourceDirLoadOptions{
 		Hidden:    false,
 		Recursive: true,
@@ -35,7 +36,7 @@ func prepareDirLoadOptions(o LoadOptions) SourceDirLoadOptions {
 	return opt
 }
 
-func (s *SourceDir) LoadObjects(source string, o LoadOptions) ([]models.Object, error) {
+func (s *SourceDir) LoadObjects(source string, o seekret.LoadOptions) ([]models.Object, error) {
 	var objectList []models.Object
 
 	opt := prepareDirLoadOptions(o)
