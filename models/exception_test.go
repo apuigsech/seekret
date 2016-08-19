@@ -1,6 +1,7 @@
 package models
 
 import (
+	"regexp"
 	"testing"
 )
 
@@ -69,84 +70,119 @@ func testNewExceptionSample(ts NewExceptionSample) bool {
 	}	
 }
 
-/*
 type RunExceptionSample struct {
-	object string
-	content []byte
-	rule *Rule
+	secret *Secret
 	exception *Exception
+	expResult bool
 }
 
+
 func TestRunException(t *testing.T) {
-	rule_1,_ := NewRule("rule_1", ".*TEST_1.*")
-	exception_1 := NewException()
-	exception_1.SetRule("rule_1")
-	
-	rule_2,_ := NewRule("rule_2", ".*TEST_2.*")
-	exception_2 := NewException()
-	exception_2.SetObject("object_2")
-	
-	rule_3,_ := NewRule("rule_3", ".*TEST_3.*")
-	exception_3 := NewException()
-	exception_3.SetNline(3)
-
-	rule_4,_ := NewRule("rule_4", "TEST_4")
-	exception_4 := NewException()
-	exception_4.SetContent(".*xxx.*")
-
 	testSamples := []RunExceptionSample{
 		{	
-			object: "object_1",
-			content: []byte(
-				"xxx\n" +
-				"yyy\n" +
-				"xxx TEST_1 yyy\n" +
-				"xxx TEST_1 zzz\n" +
-				"xxx TEST_1 www\n" +
-				"TEST_1",
-			),
-			rule: rule_1,
-			exception: exception_1,
+			secret: &Secret{
+				Object: &Object{
+					Name: "object_1",			
+				},
+				Rule: &Rule{
+					Name: "rule_1",
+				},
+				Nline: 1,
+				Line: "secret_1",
+			},
+			exception: &Exception{
+				Rule: regexp.MustCompile("rule_1"),
+			},
+			expResult: true,
 		},
 		{	
-			object: "object_2",
-			content: []byte(
-				"xxx\n" +
-				"yyy\n" +
-				"xxx TEST_2 yyy\n" +
-				"xxx TEST_2 zzz\n" +
-				"xxx TEST_2 www\n" +
-				"TEST_2",
-			),
-			rule: rule_2,
-			exception: exception_2,
+			secret: &Secret{
+				Object: &Object{
+					Name: "object_2",			
+				},
+				Rule: &Rule{
+					Name: "rule_2",
+				},
+				Nline: 2,
+				Line: "secret_2",
+			},
+			exception: &Exception{
+				Rule: regexp.MustCompile("rule_X"),
+			},
+			expResult: false,
 		},
 		{	
-			object: "object_3",
-			content: []byte(
-				"xxx\n" +
-				"yyy\n" +
-				"xxx TEST_3 yyy\n" +
-				"xxx TEST_3 zzz\n" +
-				"xxx TEST_3 www\n" +
-				"TEST_3",
-			),
-			rule: rule_3,
-			exception: exception_3,
+			secret: &Secret{
+				Object: &Object{
+					Name: "object_3",			
+				},
+				Rule: &Rule{
+					Name: "rule_3",
+				},
+				Nline: 3,
+				Line: "secret_3",
+			},
+			exception: &Exception{
+				Rule: regexp.MustCompile("rule_3"),
+				Object: regexp.MustCompile("object_3"),
+			},
+			expResult: true,
 		},
 		{	
-			object: "object_4",
-			content: []byte(
-				"xxx\n" +
-				"yyy\n" +
-				"xxx TEST_4 yyy\n" +
-				"xxx TEST_4 zzz\n" +
-				"xxx TEST_4 www\n" +
-				"TEST_4",
-			),
-			rule: rule_4,
-			exception: exception_4,
-		},		
+			secret: &Secret{
+				Object: &Object{
+					Name: "object_4",			
+				},
+				Rule: &Rule{
+					Name: "rule_4",
+				},
+				Nline: 4,
+				Line: "secret_4",
+			},
+			exception: &Exception{
+				Rule: regexp.MustCompile("rule_4"),
+				Object: regexp.MustCompile("object_X"),
+			},
+			expResult: false,
+		},
+		{	
+			secret: &Secret{
+				Object: &Object{
+					Name: "object_5",			
+				},
+				Rule: &Rule{
+					Name: "rule_5",
+				},
+				Nline: 5,
+				Line: "secret_5",
+			},
+			exception: &Exception{
+				Rule: regexp.MustCompile("rule_5"),
+				Object: regexp.MustCompile("object_5"),
+				Nline: intPtr(5),
+				Content: regexp.MustCompile("secret_5"),
+			},
+			expResult: true,
+		},
+		{	
+			secret: &Secret{
+				Object: &Object{
+					Name: "object_6",			
+				},
+				Rule: &Rule{
+					Name: "rule_6",
+				},
+				Nline: 6,
+				Line: "secret_6",
+			},
+			exception: &Exception{
+				Rule: regexp.MustCompile("rule_6"),
+				Object: regexp.MustCompile("object_X"),
+				Nline: intPtr(6),
+				Content: regexp.MustCompile("secret_X"),
+			},
+			expResult: false,
+		},
 	}
 
 	for _,ts := range testSamples {
@@ -156,8 +192,16 @@ func TestRunException(t *testing.T) {
 	}
 }
 
-
 func testRunExceptionSample(ts RunExceptionSample) bool {
-	return true
+	result := ts.exception.Run(ts.secret)
+
+	if result == ts.expResult {
+		return true
+	} else {
+		return false
+	}
 }
-*/
+
+func intPtr(i int) *int {
+	return &i
+}

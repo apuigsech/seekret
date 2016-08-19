@@ -231,29 +231,15 @@ func (s *Seekret) LoadExceptionsFromFile(file string) error {
 	return nil
 }
 
-func exceptionCheck(exceptionList []models.Exception, secret models.Secret) bool {
-	/*
-	for _, e := range exceptionList {
-		match := true
 
-		if match && e.Rule != nil && *e.Rule != secret.Rule.Name {
-			match = false
-		}
-		if match && e.Line != nil && *e.Line != secret.Nline {
-			match = false
-		}
-		if match && e.Object != nil && !(*e.Object).MatchString(secret.Object.Name) {
-			match = false
-		}
-		if match && e.Content != nil && !(*e.Content).MatchString(secret.Line) {
-			match = false
-		}
+func exceptionCheck(exceptionList []models.Exception, secret models.Secret) bool {
+	for _,x := range exceptionList {
+		match := x.Run(&secret)
 
 		if match {
 			return true
 		}
 	}
-*/
 	return false
 }
 

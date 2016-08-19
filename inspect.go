@@ -1,7 +1,6 @@
 package seekret
 
 import (
-	"fmt"
 	"bufio"
 	"bytes"
 	"github.com/apuigsech/seekret/models"

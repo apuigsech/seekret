@@ -52,7 +52,7 @@ func (x *Exception)SetContent(content string) error {
 }
 
 
-func (x *Exception)Run(s *Secret) {
+func (x *Exception)Run(s *Secret) bool {
 	match := true
 
 	if match && x.Rule != nil && !x.Rule.MatchString(s.Rule.Name) {
@@ -71,5 +71,5 @@ func (x *Exception)Run(s *Secret) {
 		match = false
 	}
 
-	s.Exception = match
+	return match
 }
