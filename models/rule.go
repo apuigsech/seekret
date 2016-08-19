@@ -19,7 +19,7 @@ type Rule struct {
 
 type RunResult struct {
 	Line string
-	nLine int
+	Nline int
 }
 
 func NewRule(name string, match string) (*Rule,error) {
@@ -80,7 +80,7 @@ func (r *Rule)Run(content []byte) []RunResult {
 			if !unmatch {
 				results = append(results, RunResult{
 					Line: line,
-					nLine: nLine,
+					Nline: nLine,
 				})
 			}
 		}		

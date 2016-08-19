@@ -1,13 +1,14 @@
 package seekret
 
 import (
+	"fmt"
 	"bufio"
 	"bytes"
 	"github.com/apuigsech/seekret/models"
 )
 
 type workerJob struct {
-	object        models.Object
+	objectGroup   []models.Object
 	ruleList      []models.Rule
 	exceptionList []models.Exception
 }
@@ -17,48 +18,51 @@ type workerResult struct {
 	secretList []models.Secret
 }
 
+
 func inspect_worker(id int, jobs <-chan workerJob, results chan<- workerResult) {
+	lid := 0
 	for job := range jobs {
+		lid = lid +1
 		result := workerResult{
 			wid: id,
 		}
 
-		for _, r := range job.ruleList {
+		content := job.objectGroup[0].Content
+
+		for _,r := range job.ruleList {
 			if r.Enabled == false {
 				continue
 			}
-			x := bufio.NewScanner(bytes.NewReader(job.object.Content))
+
+			fs := bufio.NewScanner(bytes.NewReader(content))
 			buf := []byte{}
 
 			// INFO: Remove the next two lines if using golang < 1.6
-			x.Buffer(buf, models.MaxObjectContentLen)
+			fs.Buffer(buf, models.MaxObjectContentLen)
 
 			nLine := 0
-			for x.Scan() {
+			for fs.Scan() {
 				nLine = nLine + 1
-				line := x.Text()
+				line := fs.Text()
 
-				if r.Match.MatchString(line) {
-					unmatch := false
-					for _, Unmatch := range r.Unmatch {
-						if Unmatch.MatchString(line) {
-							unmatch = true
-						}
-					}
-					if !unmatch {
-						secret := models.NewSecret(&job.object, &r, nLine, line)
+				runResultList := r.Run([]byte(line))
 
-						secret.Exception = exceptionCheck(job.exceptionList, *secret)
+				for _,object := range job.objectGroup {
+					for _,runResult := range runResultList {
+						secret := models.NewSecret(&object, &r, runResult.Nline, runResult.Line)
+						secret.SetException(exceptionCheck(job.exceptionList, *secret))
 						result.secretList = append(result.secretList, *secret)
 					}
 				}
 			}
+
 		}
+
 		results <- result
 	}
 }
 
-func (s *Seekret) Inspect(workers int) {
+func (s *Seekret)Inspect(workers int) {
 	jobs := make(chan workerJob)
 	results := make(chan workerResult)
 
@@ -66,10 +70,11 @@ func (s *Seekret) Inspect(workers int) {
 		go inspect_worker(w, jobs, results)
 	}
 
+	objectGroupMap := s.GroupObjectsByPrimaryKeyHash()
 	go func() {
-		for _, o := range s.objectList {
+		for _,objectGroup := range objectGroupMap {
 			jobs <- workerJob{
-				object:        o,
+				objectGroup: objectGroup,
 				ruleList:      s.ruleList,
 				exceptionList: s.exceptionList,
 			}
@@ -77,8 +82,9 @@ func (s *Seekret) Inspect(workers int) {
 		close(jobs)
 	}()
 
-	for i := 0; i < len(s.objectList); i++ {
+	for i := 0; i < len(objectGroupMap); i++ {
 		result := <-results
 		s.secretList = append(s.secretList, result.secretList...)
 	}
 }
+
