@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/apuigsech/seekret"
-	"github.com/apuigsech/seekret/sources"
+	"github.com/apuigsech/seekret-source-dir"
+	"github.com/apuigsech/seekret-source-git"
 	"github.com/urfave/cli"
 	"os"
 )
@@ -144,7 +145,7 @@ func seekretDir(c *cli.Context) error {
 		"recursive": c.Bool("recursive"),
 	}
 
-	err := s.LoadObjects(sources.SourceTypeDir, source, options)
+	err := s.LoadObjects(sourcedir.SourceTypeDir, source, options)
 	if err != nil {
 		return err
 	}
@@ -173,7 +174,7 @@ func seekretGit(c *cli.Context) error {
 		options["staged"] = true
 	}
 
-	err := s.LoadObjects(sources.SourceTypeGit, source, options)
+	err := s.LoadObjects(sourcegit.SourceTypeGit, source, options)
 	if err != nil {
 		return err
 	}
