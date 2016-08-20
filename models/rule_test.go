@@ -1,7 +1,11 @@
+// Copyright 2016 - Authors included on AUTHORS file.
+//
+// Use of this source code is governed by a Apache License
+// that can be found in the LICENSE file.
+
 package models
 
 import (
-	//	"fmt"
 	"testing"
 )
 

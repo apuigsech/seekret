@@ -1,3 +1,8 @@
+// Copyright 2016 - Authors included on AUTHORS file.
+//
+// Use of this source code is governed by a Apache License
+// that can be found in the LICENSE file.
+
 package seekret
 
 import (
@@ -15,6 +20,34 @@ type workerJob struct {
 type workerResult struct {
 	wid        int
 	secretList []models.Secret
+}
+
+// Inspect executes the inspection into all loaded objects, by checking all
+// rules and exceptions loaded.
+func (s *Seekret) Inspect(Nworkers int) {
+	jobs := make(chan workerJob)
+	results := make(chan workerResult)
+
+	for w := 1; w <= Nworkers; w++ {
+		go inspect_worker(w, jobs, results)
+	}
+
+	objectGroupMap := s.GroupObjectsByPrimaryKeyHash()
+	go func() {
+		for _, objectGroup := range objectGroupMap {
+			jobs <- workerJob{
+				objectGroup:   objectGroup,
+				ruleList:      s.ruleList,
+				exceptionList: s.exceptionList,
+			}
+		}
+		close(jobs)
+	}()
+
+	for i := 0; i < len(objectGroupMap); i++ {
+		result := <-results
+		s.secretList = append(s.secretList, result.secretList...)
+	}
 }
 
 func inspect_worker(id int, jobs <-chan workerJob, results chan<- workerResult) {
@@ -60,28 +93,13 @@ func inspect_worker(id int, jobs <-chan workerJob, results chan<- workerResult) 
 	}
 }
 
-func (s *Seekret) Inspect(Nworkers int) {
-	jobs := make(chan workerJob)
-	results := make(chan workerResult)
+func exceptionCheck(exceptionList []models.Exception, secret models.Secret) bool {
+	for _, x := range exceptionList {
+		match := x.Run(&secret)
 
-	for w := 1; w <= Nworkers; w++ {
-		go inspect_worker(w, jobs, results)
-	}
-
-	objectGroupMap := s.GroupObjectsByPrimaryKeyHash()
-	go func() {
-		for _, objectGroup := range objectGroupMap {
-			jobs <- workerJob{
-				objectGroup:   objectGroup,
-				ruleList:      s.ruleList,
-				exceptionList: s.exceptionList,
-			}
+		if match {
+			return true
 		}
-		close(jobs)
-	}()
-
-	for i := 0; i < len(objectGroupMap); i++ {
-		result := <-results
-		s.secretList = append(s.secretList, result.secretList...)
 	}
+	return false
 }

@@ -1,3 +1,8 @@
+// Copyright 2016 - Authors included on AUTHORS file.
+//
+// Use of this source code is governed by a Apache License
+// that can be found in the LICENSE file.
+
 package models
 
 import (
@@ -6,8 +11,10 @@ import (
 	"sort"
 )
 
+// MaxObjectContentLen contains the maximum size for the content of an object.
 const MaxObjectContentLen = 1024 * 5000
 
+// Represents an object.
 type Object struct {
 	Name    string
 	Content []byte
@@ -16,15 +23,20 @@ type Object struct {
 	PrimaryKeyHash []byte
 }
 
+// Represents the metadata of an object.
 type MetadataData struct {
 	value string
 	attr  MetadataAttributes
 }
 
+// Represents the attributes of metadata.
 type MetadataAttributes struct {
+	// All objects with same value on this key has the same content. It's used
+	// to optimise the inspection.
 	PrimaryKey bool
 }
 
+// NewObject creates a new object.
 func NewObject(name string, content []byte) *Object {
 	if len(content) > MaxObjectContentLen {
 		content = content[:MaxObjectContentLen]
@@ -39,6 +51,7 @@ func NewObject(name string, content []byte) *Object {
 	return o
 }
 
+// SetMetadata sets a metadata value for the object.
 func (o *Object) SetMetadata(key string, value string, attr MetadataAttributes) error {
 	o.Metadata[key] = MetadataData{
 		value: value,
@@ -52,6 +65,7 @@ func (o *Object) SetMetadata(key string, value string, attr MetadataAttributes) 
 	return nil
 }
 
+// SetMetadata gets a metadata value from the object.
 func (o *Object) GetMetadata(key string) (string, error) {
 	data, ok := o.Metadata[key]
 	if !ok {
@@ -61,6 +75,7 @@ func (o *Object) GetMetadata(key string) (string, error) {
 	return data.value, nil
 }
 
+// GetMetadataAll gets a map that contains all metadata of the object.
 func (o *Object) GetMetadataAll(attr bool) map[string]string {
 	metadataAll := make(map[string]string)
 	for k, v := range o.Metadata {
@@ -69,6 +84,8 @@ func (o *Object) GetMetadataAll(attr bool) map[string]string {
 	return metadataAll
 }
 
+// GetPrimaryKeyHash returns the primary key hash of the object. This hash is
+// calculated by using the information of all metadata marked as primary key.
 func (o *Object) GetPrimaryKeyHash() []byte {
 	return o.PrimaryKeyHash
 }

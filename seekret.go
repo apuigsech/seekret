@@ -1,3 +1,8 @@
+// Copyright 2016 - Authors included on AUTHORS file.
+//
+// Use of this source code is governed by a Apache License
+// that can be found in the LICENSE file.
+
 package seekret
 
 import (
@@ -10,24 +15,33 @@ import (
 	"strings"
 )
 
+// Seekret contains a seekret context and exposes the API to manipulate it.
 type Seekret struct {
-	ruleList      []models.Rule
-	objectList    []models.Object
-	secretList    []models.Secret
+	// List of rules loaded into the context.
+	ruleList []models.Rule
+
+	// List of objects loaded into the context.
+	objectList []models.Object
+
+	// List of exceptions loaded into the context.
 	exceptionList []models.Exception
+
+	// List of secrets detected after the inspection.
+	secretList []models.Secret
 }
 
+// NewSeekret returns a new seekret context.
 func NewSeekret() *Seekret {
 	s := &Seekret{}
 	return s
 }
 
-func (s *Seekret) GroupObjectsByMetadata(k string) map[string][]models.Object {
-	return models.GroupObjectsByMetadata(s.objectList, k)
-}
-
-func (s *Seekret) GroupObjectsByPrimaryKeyHash() map[string][]models.Object {
-	return models.GroupObjectsByPrimaryKeyHash(s.objectList)
+// AddRule adds a new rule into the context.
+func (s *Seekret) AddRule(rule models.Rule, enabled bool) {
+	if enabled {
+		rule.Enable()
+	}
+	s.ruleList = append(s.ruleList, rule)
 }
 
 type ruleYaml struct {
@@ -36,23 +50,7 @@ type ruleYaml struct {
 	Unmatch     []string
 }
 
-const DefaultRulesDir = "$GOPATH/src/github.com/apuigsech/seekret/rules"
-
-func DefaultRulesPath() string {
-	rulesPath := os.Getenv("SEEKRET_RULES_PATH")
-	if rulesPath == "" {
-		rulesPath = os.ExpandEnv(DefaultRulesDir)
-	}
-	return rulesPath
-}
-
-func (s *Seekret) AddRule(rule models.Rule, enabled bool) {
-	if enabled {
-		rule.Enable()
-	}
-	s.ruleList = append(s.ruleList, rule)
-}
-
+// LoadRulesFromFile loads rules from a YAML file.
 func (s *Seekret) LoadRulesFromFile(file string, defaulEnabled bool) error {
 	var ruleYamlMap map[string]ruleYaml
 
@@ -92,6 +90,7 @@ func (s *Seekret) LoadRulesFromFile(file string, defaulEnabled bool) error {
 	return nil
 }
 
+// LoadRulesFromFile loads rules from all YAML files inside a directory.
 func (s *Seekret) LoadRulesFromDir(dir string, defaulEnabled bool) error {
 	fi, err := os.Stat(dir)
 	if err != nil {
@@ -118,6 +117,8 @@ func (s *Seekret) LoadRulesFromDir(dir string, defaulEnabled bool) error {
 	return nil
 }
 
+// LoadRulesFromFile loads rules from all YAML files inside different
+// directories separated by ':'.
 func (s *Seekret) LoadRulesFromPath(path string, defaulEnabled bool) error {
 	if path == "" {
 		path = os.ExpandEnv(DefaultRulesDir)
@@ -132,19 +133,34 @@ func (s *Seekret) LoadRulesFromPath(path string, defaulEnabled bool) error {
 	return nil
 }
 
+const defaultRulesDir = "$GOPATH/src/github.com/apuigsech/seekret/rules"
+
+// DefaultRulesPath return the default PATH that contains rules.
+func DefaultRulesPath() string {
+	rulesPath := os.Getenv("SEEKRET_RULES_PATH")
+	if rulesPath == "" {
+		rulesPath = os.ExpandEnv(defaultRulesDir)
+	}
+	return rulesPath
+}
+
+// ListRules return an array with all loaded rules.
 func (s *Seekret) ListRules() []models.Rule {
 	return s.ruleList
 }
 
+// EnableRule enables rules that match with a regular expression.
 func (s *Seekret) EnableRule(name string) error {
 	return setRuleEnabled(s.ruleList, name, true)
 }
 
+// DisableRule disables rules that match with a regular expression.
 func (s *Seekret) DisableRule(name string) error {
 	return setRuleEnabled(s.ruleList, name, false)
 }
 
 func setRuleEnabled(ruleList []models.Rule, name string, enabled bool) error {
+	// TODO: implement regular expression.
 	found := false
 	for i, r := range ruleList {
 		if r.Name == name {
@@ -160,6 +176,32 @@ func setRuleEnabled(ruleList []models.Rule, name string, enabled bool) error {
 	return nil
 }
 
+// LoadObjects loads objects form an specific source. It can load objects from
+// different source types, that are implemented following the SourceType
+// interface.
+func (s *Seekret) LoadObjects(st SourceType, source string, opt LoadOptions) error {
+	objectList, err := st.LoadObjects(source, opt)
+	if err != nil {
+		return err
+	}
+	s.objectList = append(s.objectList, objectList...)
+	return nil
+}
+
+// GroupObjectsByMetadata returns a map with all objects grouped by specific
+// metadata key.
+func (s *Seekret) GroupObjectsByMetadata(k string) map[string][]models.Object {
+	return models.GroupObjectsByMetadata(s.objectList, k)
+}
+
+// GroupObjectsByPrimaryKeyHashr eturns a map with all objects grouped by
+// the primary key hash, that is calculated from all metadata keys with the
+// primary attribute.
+// All returned objects could have the same content, even if are not the same.
+func (s *Seekret) GroupObjectsByPrimaryKeyHash() map[string][]models.Object {
+	return models.GroupObjectsByPrimaryKeyHash(s.objectList)
+}
+
 type exceptionYaml struct {
 	Rule    *string
 	Object  *string
@@ -167,10 +209,12 @@ type exceptionYaml struct {
 	Content *string
 }
 
+// AddException adds a new exception into the context.
 func (s *Seekret) AddException(exception models.Exception) {
 	s.exceptionList = append(s.exceptionList, exception)
 }
 
+// LoadExceptionsFromFile loads exceptions from a YAML file.
 func (s *Seekret) LoadExceptionsFromFile(file string) error {
 	var exceptionYamlList []exceptionYaml
 
@@ -226,17 +270,7 @@ func (s *Seekret) LoadExceptionsFromFile(file string) error {
 	return nil
 }
 
-func exceptionCheck(exceptionList []models.Exception, secret models.Secret) bool {
-	for _, x := range exceptionList {
-		match := x.Run(&secret)
-
-		if match {
-			return true
-		}
-	}
-	return false
-}
-
+// ListSecrets return an array with all found secrets after the inspection.
 func (s *Seekret) ListSecrets() []models.Secret {
 	return s.secretList
 }
