@@ -19,8 +19,8 @@ func NewException() *Exception {
 	return x
 }
 
-func (x *Exception)SetRule(rule string) error {
-	ruleRegexp,err := regexp.Compile("(?i)" + rule)
+func (x *Exception) SetRule(rule string) error {
+	ruleRegexp, err := regexp.Compile("(?i)" + rule)
 	if err != nil {
 		return err
 	}
@@ -28,31 +28,30 @@ func (x *Exception)SetRule(rule string) error {
 	return nil
 }
 
-func (x *Exception)SetObject(object string) error {
-	objectRegexp,err := regexp.Compile("(?i)" + object)
+func (x *Exception) SetObject(object string) error {
+	objectRegexp, err := regexp.Compile("(?i)" + object)
 	if err != nil {
 		return err
 	}
 	x.Object = objectRegexp
-	return nil	
+	return nil
 }
 
-func (x *Exception)SetNline(nLine int) error {
+func (x *Exception) SetNline(nLine int) error {
 	x.Nline = &nLine
 	return nil
 }
 
-func (x *Exception)SetContent(content string) error {
-	contentRegexp,err := regexp.Compile("(?i)" + content)
+func (x *Exception) SetContent(content string) error {
+	contentRegexp, err := regexp.Compile("(?i)" + content)
 	if err != nil {
 		return err
 	}
 	x.Content = contentRegexp
-	return nil	
+	return nil
 }
 
-
-func (x *Exception)Run(s *Secret) bool {
+func (x *Exception) Run(s *Secret) bool {
 	match := true
 
 	if match && x.Rule != nil && !x.Rule.MatchString(s.Rule.Name) {

@@ -1,31 +1,31 @@
 package models
 
 import (
-//	"fmt"
+	//	"fmt"
 	"testing"
 )
 
 type NewRuleSample struct {
-	name string
-	match string
+	name    string
+	match   string
 	unmatch []string
-	ok bool
+	ok      bool
 }
 
 func TestNewRule(t *testing.T) {
 	testSamples := []NewRuleSample{
 		{
-			name: "rule_1",
+			name:  "rule_1",
 			match: "match_1",
-			ok: true,
+			ok:    true,
 		},
 		{
-			name: "rule_2",
+			name:  "rule_2",
 			match: "*",
-			ok: false,
+			ok:    false,
 		},
 		{
-			name: "rule_3",
+			name:  "rule_3",
 			match: "match_3",
 			unmatch: []string{
 				"unmatch_3_1",
@@ -35,7 +35,7 @@ func TestNewRule(t *testing.T) {
 			ok: true,
 		},
 		{
-			name: "rule_4",
+			name:  "rule_4",
 			match: "match_4",
 			unmatch: []string{
 				"unmatch_4_1",
@@ -46,7 +46,7 @@ func TestNewRule(t *testing.T) {
 		},
 	}
 
-	for _,ts := range testSamples {
+	for _, ts := range testSamples {
 		if !testNewRuleSample(ts) {
 			t.Error("unexpected new rule")
 		}
@@ -54,15 +54,15 @@ func TestNewRule(t *testing.T) {
 }
 
 func testNewRuleSample(ts NewRuleSample) bool {
-	r,err := NewRule(ts.name, ts.match)
+	r, err := NewRule(ts.name, ts.match)
 
 	ok_1 := (err == nil)
 
 	ok_2 := true
-	for _,unmatch := range ts.unmatch {
+	for _, unmatch := range ts.unmatch {
 		err := r.AddUnmatch(unmatch)
-	
-		if (err != nil) {
+
+		if err != nil {
 			ok_2 = false
 		}
 	}
@@ -79,11 +79,11 @@ func testNewRuleSample(ts NewRuleSample) bool {
 }
 
 type RunRuleSample struct {
-	match string
-	unmatch []string
-	content []byte
+	match      string
+	unmatch    []string
+	content    []byte
 	expResults []RunResult
-	ok bool
+	ok         bool
 }
 
 func TestRunRule(t *testing.T) {
@@ -92,17 +92,17 @@ func TestRunRule(t *testing.T) {
 			match: ".*TEST_1.*",
 			content: []byte(
 				"xxx\n" +
-				"yyy\n" +
-				"xxx TEST_1 yyy\n" +
-				"TEST_1",
+					"yyy\n" +
+					"xxx TEST_1 yyy\n" +
+					"TEST_1",
 			),
 			expResults: []RunResult{
 				{
-					Line: "xxx TEST_1 yyy",
+					Line:  "xxx TEST_1 yyy",
 					nLine: 3,
 				},
 				{
-					Line: "TEST_1",
+					Line:  "TEST_1",
 					nLine: 4,
 				},
 			},
@@ -116,19 +116,19 @@ func TestRunRule(t *testing.T) {
 			},
 			content: []byte(
 				"xxx\n" +
-				"yyy\n" +
-				"xxx TEST_2 yyy\n" +
-				"xxx TEST_2 zzz\n" +
-				"xxx TEST_2 www\n" +
-				"TEST_2",
+					"yyy\n" +
+					"xxx TEST_2 yyy\n" +
+					"xxx TEST_2 zzz\n" +
+					"xxx TEST_2 www\n" +
+					"TEST_2",
 			),
 			expResults: []RunResult{
 				{
-					Line: "xxx TEST_2 www",
+					Line:  "xxx TEST_2 www",
 					nLine: 5,
 				},
 				{
-					Line: "TEST_2",
+					Line:  "TEST_2",
 					nLine: 6,
 				},
 			},
@@ -136,7 +136,7 @@ func TestRunRule(t *testing.T) {
 		},
 	}
 
-	for _,ts := range testSamples {
+	for _, ts := range testSamples {
 		if !testRunRuleSample(ts) {
 			t.Error("unexpected run rule results")
 		}
@@ -144,12 +144,12 @@ func TestRunRule(t *testing.T) {
 }
 
 func testRunRuleSample(ts RunRuleSample) bool {
-	r,err := NewRule("rule", ts.match)
+	r, err := NewRule("rule", ts.match)
 	if err != nil {
 		return false
 	}
 
-	for _,unmatch := range ts.unmatch {
+	for _, unmatch := range ts.unmatch {
 		err := r.AddUnmatch(unmatch)
 		if err != nil {
 			return false
@@ -159,17 +159,17 @@ func testRunRuleSample(ts RunRuleSample) bool {
 	results := r.Run(ts.content)
 
 	ok := true
-	for _,res := range results {
+	for _, res := range results {
 		ok_s := false
-		for _,expRes := range ts.expResults {
-			if (res.nLine == expRes.nLine && res.Line == expRes.Line) {
+		for _, expRes := range ts.expResults {
+			if res.nLine == expRes.nLine && res.Line == expRes.Line {
 				ok_s = true
 			}
 		}
-		
+
 		if ok_s == false {
 			ok = false
-		} 
+		}
 	}
 
 	if ok == ts.ok {

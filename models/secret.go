@@ -11,9 +11,9 @@ type Secret struct {
 func NewSecret(object *Object, rule *Rule, nLine int, line string) *Secret {
 	s := &Secret{
 		Object: object,
-		Rule: rule,
-		Nline: nLine,
-		Line: line,
+		Rule:   rule,
+		Nline:  nLine,
+		Line:   line,
 	}
 	return s
 }

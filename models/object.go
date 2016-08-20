@@ -2,23 +2,23 @@ package models
 
 import (
 	"fmt"
-	"sort"
 	"github.com/codahale/blake2"
+	"sort"
 )
 
 const MaxObjectContentLen = 1024 * 5000
 
 type Object struct {
-	Name     string
-	Content  []byte
+	Name    string
+	Content []byte
 
-	Metadata map[string]MetadataData
+	Metadata       map[string]MetadataData
 	PrimaryKeyHash []byte
 }
 
 type MetadataData struct {
 	value string
-	attr MetadataAttributes
+	attr  MetadataAttributes
 }
 
 type MetadataAttributes struct {
@@ -30,19 +30,19 @@ func NewObject(name string, content []byte) *Object {
 		content = content[:MaxObjectContentLen]
 	}
 	o := &Object{
-		Name: name,
+		Name:    name,
 		Content: content,
 
-		Metadata: make(map[string]MetadataData),
+		Metadata:       make(map[string]MetadataData),
 		PrimaryKeyHash: nil,
 	}
 	return o
 }
 
-func (o *Object)SetMetadata(key string, value string, attr MetadataAttributes) error {
+func (o *Object) SetMetadata(key string, value string, attr MetadataAttributes) error {
 	o.Metadata[key] = MetadataData{
 		value: value,
-		attr: attr,
+		attr:  attr,
 	}
 
 	if attr.PrimaryKey {
@@ -52,30 +52,30 @@ func (o *Object)SetMetadata(key string, value string, attr MetadataAttributes) e
 	return nil
 }
 
-func (o *Object)GetMetadata(key string) (string,error) {
+func (o *Object) GetMetadata(key string) (string, error) {
 	data, ok := o.Metadata[key]
 	if !ok {
-		return "",fmt.Errorf("%s unexistent key", key)
+		return "", fmt.Errorf("%s unexistent key", key)
 	}
 
-	return data.value,nil 
+	return data.value, nil
 }
 
-func (o *Object)GetMetadataAll(attr bool) (map[string]string) {
+func (o *Object) GetMetadataAll(attr bool) map[string]string {
 	metadataAll := make(map[string]string)
-	for k,v := range o.Metadata {
+	for k, v := range o.Metadata {
 		metadataAll[k] = v.value
 	}
 	return metadataAll
 }
 
-func (o *Object)GetPrimaryKeyHash() []byte {
+func (o *Object) GetPrimaryKeyHash() []byte {
 	return o.PrimaryKeyHash
 }
 
-func (o *Object)updatePrimaryKeyHash() {
+func (o *Object) updatePrimaryKeyHash() {
 	var primayKeyList []string
-	for k,v := range o.Metadata{
+	for k, v := range o.Metadata {
 		if v.attr.PrimaryKey {
 			primayKeyList = append(primayKeyList, k)
 		}
@@ -83,7 +83,7 @@ func (o *Object)updatePrimaryKeyHash() {
 	sort.Strings(primayKeyList)
 
 	var text string
-	for _,k := range primayKeyList {
+	for _, k := range primayKeyList {
 		text = text + fmt.Sprintf("{%s//%s}", k, o.Metadata[k].value)
 	}
 	if text == "" {
@@ -98,11 +98,10 @@ func (o *Object)updatePrimaryKeyHash() {
 	o.PrimaryKeyHash = h.Sum(nil)
 }
 
-
-func GroupObjectsByMetadata(objects []Object, k string) (map[string][]Object) {
+func GroupObjectsByMetadata(objects []Object, k string) map[string][]Object {
 	objectGroups := make(map[string][]Object)
-	for _,o := range objects {
-		v,err := o.GetMetadata(k)
+	for _, o := range objects {
+		v, err := o.GetMetadata(k)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -120,9 +119,9 @@ func GroupObjectsByMetadata(objects []Object, k string) (map[string][]Object) {
 	return objectGroups
 }
 
-func GroupObjectsByPrimaryKeyHash(objects []Object) (map[string][]Object) {
+func GroupObjectsByPrimaryKeyHash(objects []Object) map[string][]Object {
 	objectGroups := make(map[string][]Object)
-	for _,o := range objects {
+	for _, o := range objects {
 		var objectList []Object
 		var ok bool
 
@@ -135,4 +134,3 @@ func GroupObjectsByPrimaryKeyHash(objects []Object) (map[string][]Object) {
 	}
 	return objectGroups
 }
-

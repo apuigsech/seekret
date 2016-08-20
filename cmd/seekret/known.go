@@ -23,7 +23,7 @@ func LoadKnownFromFile(s *seekret.Seekret, file string) error {
 
 	scanner := bufio.NewScanner(fh)
 	for scanner.Scan() {
-		rule,err  := models.NewRule("known", scanner.Text())
+		rule, err := models.NewRule("known", scanner.Text())
 		if err != nil {
 			return err
 		}

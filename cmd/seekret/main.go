@@ -135,7 +135,7 @@ func seekretBefore(c *cli.Context) error {
 
 func seekretDir(c *cli.Context) error {
 	source := c.Args().Get(0)
-	if source == ""  {
+	if source == "" {
 		cli.ShowSubcommandHelp(c)
 		return nil
 	}
@@ -155,7 +155,7 @@ func seekretDir(c *cli.Context) error {
 
 func seekretGit(c *cli.Context) error {
 	source := c.Args().Get(0)
-	if source == ""  {
+	if source == "" {
 		cli.ShowSubcommandHelp(c)
 		return nil
 	}

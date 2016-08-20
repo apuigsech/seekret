@@ -1,16 +1,15 @@
 package models
 
 import (
-	"fmt"
-	"regexp"
 	"bufio"
 	"bytes"
+	"fmt"
+	"regexp"
 )
 
-
 type Rule struct {
-	Name    string
-//	ObjectMatch *regexp.Regexp
+	Name string
+	//	ObjectMatch *regexp.Regexp
 
 	Enabled bool
 	Match   *regexp.Regexp
@@ -18,14 +17,14 @@ type Rule struct {
 }
 
 type RunResult struct {
-	Line string
+	Line  string
 	Nline int
 }
 
-func NewRule(name string, match string) (*Rule,error) {
-	matchRegexp,err := regexp.Compile("(?i)" + match)
+func NewRule(name string, match string) (*Rule, error) {
+	matchRegexp, err := regexp.Compile("(?i)" + match)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	if err != nil {
 		fmt.Println(err)
@@ -33,22 +32,22 @@ func NewRule(name string, match string) (*Rule,error) {
 
 	r := &Rule{
 		Enabled: false,
-		Name: name,
-		Match: matchRegexp,
+		Name:    name,
+		Match:   matchRegexp,
 	}
-	return r,nil
+	return r, nil
 }
 
-func (r *Rule)Enable() {
+func (r *Rule) Enable() {
 	r.Enabled = true
 }
 
-func (r *Rule)Disable() {
+func (r *Rule) Disable() {
 	r.Enabled = false
 }
 
-func (r *Rule)AddUnmatch(unmatch string) error {
-	unmatchRegexp,err := regexp.Compile("(?i)" + unmatch)
+func (r *Rule) AddUnmatch(unmatch string) error {
+	unmatchRegexp, err := regexp.Compile("(?i)" + unmatch)
 	if err != nil {
 		return err
 	}
@@ -58,9 +57,8 @@ func (r *Rule)AddUnmatch(unmatch string) error {
 	return nil
 }
 
-
-func (r *Rule)Run(content []byte) []RunResult {
-	var results []RunResult 
+func (r *Rule) Run(content []byte) []RunResult {
+	var results []RunResult
 
 	b := bufio.NewScanner(bytes.NewReader(content))
 
@@ -79,11 +77,11 @@ func (r *Rule)Run(content []byte) []RunResult {
 
 			if !unmatch {
 				results = append(results, RunResult{
-					Line: line,
+					Line:  line,
 					Nline: nLine,
 				})
 			}
-		}		
+		}
 	}
 
 	return results

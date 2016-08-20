@@ -2,12 +2,12 @@ package seekret
 
 import (
 	"fmt"
-	"os"
-	"io/ioutil"
-	"path/filepath"
-	"strings"
 	"github.com/apuigsech/seekret/models"
 	"gopkg.in/yaml.v2"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 type Seekret struct {
@@ -22,18 +22,18 @@ func NewSeekret() *Seekret {
 	return s
 }
 
-func (s *Seekret)GroupObjectsByMetadata(k string) (map[string][]models.Object) {
+func (s *Seekret) GroupObjectsByMetadata(k string) map[string][]models.Object {
 	return models.GroupObjectsByMetadata(s.objectList, k)
 }
 
-func (s *Seekret)GroupObjectsByPrimaryKeyHash() (map[string][]models.Object) {
+func (s *Seekret) GroupObjectsByPrimaryKeyHash() map[string][]models.Object {
 	return models.GroupObjectsByPrimaryKeyHash(s.objectList)
 }
 
 type ruleYaml struct {
 	ObjectMatch string
-	Match   string
-	Unmatch []string
+	Match       string
+	Unmatch     []string
 }
 
 const DefaultRulesDir = "$GOPATH/src/github.com/apuigsech/seekret/rules"
@@ -45,8 +45,6 @@ func DefaultRulesPath() string {
 	}
 	return rulesPath
 }
-
-
 
 func (s *Seekret) AddRule(rule models.Rule, enabled bool) {
 	if enabled {
@@ -66,7 +64,7 @@ func (s *Seekret) LoadRulesFromFile(file string, defaulEnabled bool) error {
 
 	ruleBase := filepath.Base(filename)
 	if filepath.Ext(ruleBase) == ".rule" {
-		ruleBase = ruleBase[0:len(ruleBase)-5]
+		ruleBase = ruleBase[0 : len(ruleBase)-5]
 	}
 
 	yamlData, err := ioutil.ReadFile(filename)
@@ -80,7 +78,7 @@ func (s *Seekret) LoadRulesFromFile(file string, defaulEnabled bool) error {
 	}
 
 	for k, v := range ruleYamlMap {
-		rule, err := models.NewRule(ruleBase + "." + k, v.Match)
+		rule, err := models.NewRule(ruleBase+"."+k, v.Match)
 		if err != nil {
 			return err
 		}
@@ -134,21 +132,19 @@ func (s *Seekret) LoadRulesFromPath(path string, defaulEnabled bool) error {
 	return nil
 }
 
-
 func (s *Seekret) ListRules() []models.Rule {
 	return s.ruleList
 }
 
-
-func (s *Seekret) EnableRule(name string) (error) {
+func (s *Seekret) EnableRule(name string) error {
 	return setRuleEnabled(s.ruleList, name, true)
 }
 
-func (s *Seekret) DisableRule(name string) (error) {
+func (s *Seekret) DisableRule(name string) error {
 	return setRuleEnabled(s.ruleList, name, false)
 }
 
-func setRuleEnabled(ruleList []models.Rule, name string, enabled bool) (error) {
+func setRuleEnabled(ruleList []models.Rule, name string, enabled bool) error {
 	found := false
 	for i, r := range ruleList {
 		if r.Name == name {
@@ -163,7 +159,6 @@ func setRuleEnabled(ruleList []models.Rule, name string, enabled bool) (error) {
 
 	return nil
 }
-
 
 type exceptionYaml struct {
 	Rule    *string
@@ -194,7 +189,7 @@ func (s *Seekret) LoadExceptionsFromFile(file string) error {
 		return err
 	}
 
-	for _,v := range exceptionYamlList {
+	for _, v := range exceptionYamlList {
 		x := models.NewException()
 
 		if v.Rule != nil {
@@ -211,7 +206,7 @@ func (s *Seekret) LoadExceptionsFromFile(file string) error {
 			}
 		}
 
-		if v.Line!= nil {
+		if v.Line != nil {
 			err := x.SetNline(*v.Line)
 			if err != nil {
 				return err
@@ -231,9 +226,8 @@ func (s *Seekret) LoadExceptionsFromFile(file string) error {
 	return nil
 }
 
-
 func exceptionCheck(exceptionList []models.Exception, secret models.Secret) bool {
-	for _,x := range exceptionList {
+	for _, x := range exceptionList {
 		match := x.Run(&secret)
 
 		if match {
@@ -242,7 +236,6 @@ func exceptionCheck(exceptionList []models.Exception, secret models.Secret) bool
 	}
 	return false
 }
-
 
 func (s *Seekret) ListSecrets() []models.Secret {
 	return s.secretList
