@@ -103,11 +103,11 @@ func TestRunRule(t *testing.T) {
 			expResults: []RunResult{
 				{
 					Line:  "xxx TEST_1 yyy",
-					nLine: 3,
+					Nline: 3,
 				},
 				{
 					Line:  "TEST_1",
-					nLine: 4,
+					Nline: 4,
 				},
 			},
 			ok: true,
@@ -129,11 +129,11 @@ func TestRunRule(t *testing.T) {
 			expResults: []RunResult{
 				{
 					Line:  "xxx TEST_2 www",
-					nLine: 5,
+					Nline: 5,
 				},
 				{
 					Line:  "TEST_2",
-					nLine: 6,
+					Nline: 6,
 				},
 			},
 			ok: true,
@@ -166,7 +166,7 @@ func testRunRuleSample(ts RunRuleSample) bool {
 	for _, res := range results {
 		ok_s := false
 		for _, expRes := range ts.expResults {
-			if res.nLine == expRes.nLine && res.Line == expRes.Line {
+			if res.Nline == expRes.Nline && res.Line == expRes.Line {
 				ok_s = true
 			}
 		}

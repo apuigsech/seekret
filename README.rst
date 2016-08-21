@@ -321,7 +321,7 @@ Contains a regexp that should match the content.
    :target: https://travis-ci.org/apuigsech/seekret
    :width: 88px
    :height: 20px
-.. |Documentation Status| image:: https://godoc.org/github.com/apuigsech/seekret/lib?status.svg
-   :target: https://godoc.org/github.com/apuigsech/seekret/lib
+.. |Documentation Status| image:: https://godoc.org/github.com/apuigsech/seekret?status.svg
+   :target: https://godoc.org/github.com/apuigsech/seekret
    :width: 88px
    :height: 20px
