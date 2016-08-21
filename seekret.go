@@ -121,7 +121,7 @@ func (s *Seekret) LoadRulesFromDir(dir string, defaulEnabled bool) error {
 // directories separated by ':'.
 func (s *Seekret) LoadRulesFromPath(path string, defaulEnabled bool) error {
 	if path == "" {
-		path = os.ExpandEnv(DefaultRulesDir)
+		path = DefaultRulesPath()
 	}
 	dirList := strings.Split(path, ":")
 	for _, dir := range dirList {
@@ -194,7 +194,7 @@ func (s *Seekret) GroupObjectsByMetadata(k string) map[string][]models.Object {
 	return models.GroupObjectsByMetadata(s.objectList, k)
 }
 
-// GroupObjectsByPrimaryKeyHashr eturns a map with all objects grouped by
+// GroupObjectsByPrimaryKeyHash returns a map with all objects grouped by
 // the primary key hash, that is calculated from all metadata keys with the
 // primary attribute.
 // All returned objects could have the same content, even if are not the same.
