@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -149,20 +150,30 @@ func (s *Seekret) ListRules() []models.Rule {
 	return s.ruleList
 }
 
-// EnableRule enables rules that match with a regular expression.
+// EnableRule enables specific rule.
 func (s *Seekret) EnableRule(name string) error {
 	return setRuleEnabled(s.ruleList, name, true)
 }
 
-// DisableRule disables rules that match with a regular expression.
+// DisableRule disables specific rule.
 func (s *Seekret) DisableRule(name string) error {
 	return setRuleEnabled(s.ruleList, name, false)
 }
 
+// EnableRule enables rules that match with a regular expression.
+func (s *Seekret) EnableRuleByRegexp(name string) int {
+	return setRuleEnabledByRegexp(s.ruleList, name, true)
+}
+
+// DisableRule disables rules that match with a regular expression.
+func (s *Seekret) DisableRuleByRegexp(name string) int {
+	return setRuleEnabledByRegexp(s.ruleList, name, false)
+}
+
+
 func setRuleEnabled(ruleList []models.Rule, name string, enabled bool) error {
-	// TODO: implement regular expression.
 	found := false
-	for i, r := range ruleList {
+	for i,r := range ruleList {
 		if r.Name == name {
 			found = true
 			ruleList[i].Enabled = enabled
@@ -174,6 +185,21 @@ func setRuleEnabled(ruleList []models.Rule, name string, enabled bool) error {
 	}
 
 	return nil
+}
+
+func setRuleEnabledByRegexp(ruleList []models.Rule, nameRegexp string, enabled bool) int {
+	count := 0
+	nameMatch,err := regexp.Compile("(?i)" + nameRegexp)
+	if err != nil {
+		return 0
+	}
+	for i,r := range ruleList {
+		if nameMatch.Match([]byte(r.Name)) {
+			count = count + 1
+			ruleList[i].Enabled = enabled
+		}
+	}
+	return count
 }
 
 // LoadObjects loads objects form an specific source. It can load objects from
