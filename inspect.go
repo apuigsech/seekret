@@ -33,6 +33,7 @@ func (s *Seekret) Inspect(Nworkers int) {
 	}
 
 	objectGroupMap := s.GroupObjectsByPrimaryKeyHash()
+
 	go func() {
 		for _, objectGroup := range objectGroupMap {
 			jobs <- workerJob{

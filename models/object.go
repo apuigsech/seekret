@@ -14,13 +14,16 @@ import (
 // MaxObjectContentLen contains the maximum size for the content of an object.
 const MaxObjectContentLen = 1024 * 5000
 
+// Contains a KeyHash or nil
+type KeyHash *[]byte 
+
 // Represents an object.
 type Object struct {
 	Name    string
 	Content []byte
 
 	Metadata       map[string]MetadataData
-	PrimaryKeyHash []byte
+	PrimaryKeyHash KeyHash
 }
 
 // Represents the metadata of an object.
@@ -86,7 +89,7 @@ func (o *Object) GetMetadataAll(attr bool) map[string]string {
 
 // GetPrimaryKeyHash returns the primary key hash of the object. This hash is
 // calculated by using the information of all metadata marked as primary key.
-func (o *Object) GetPrimaryKeyHash() []byte {
+func (o *Object) GetPrimaryKeyHash() KeyHash {
 	return o.PrimaryKeyHash
 }
 
@@ -112,7 +115,9 @@ func (o *Object) updatePrimaryKeyHash() {
 		Size: 32,
 	})
 	h.Write([]byte(text))
-	o.PrimaryKeyHash = h.Sum(nil)
+
+	primayKeyHask := h.Sum(nil)
+	o.PrimaryKeyHash = &primayKeyHask
 }
 
 func GroupObjectsByMetadata(objects []Object, k string) map[string][]Object {
@@ -141,13 +146,20 @@ func GroupObjectsByPrimaryKeyHash(objects []Object) map[string][]Object {
 	for _, o := range objects {
 		var objectList []Object
 		var ok bool
+		var key string
 
-		objectList, ok = objectGroups[string(o.PrimaryKeyHash)]
+		if o.PrimaryKeyHash != nil {
+			key = string(*o.PrimaryKeyHash)
+		} else {
+			key = o.Name
+		}
+
+		objectList, ok = objectGroups[key]
 		if !ok {
 			objectList = make([]Object, 0)
 		}
 		objectList = append(objectList, o)
-		objectGroups[string(o.PrimaryKeyHash)] = objectList
+		objectGroups[key] = objectList
 	}
 	return objectGroups
 }
