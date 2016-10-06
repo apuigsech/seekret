@@ -6,8 +6,6 @@
 package models
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
 	"regexp"
 )
@@ -73,33 +71,23 @@ func (r *Rule) AddUnmatch(unmatch string) error {
 	return nil
 }
 
-// Run executes the rule into a content to find all lines that matches it.
-func (r *Rule) Run(content []byte) []RunResult {
-	var results []RunResult
+// Run executes the rule on a line passed in and returns a boolean
+func (r *Rule) Run(line string) bool {
 
-	b := bufio.NewScanner(bytes.NewReader(content))
+	result := false
 
-	nLine := 0
-	for b.Scan() {
-		nLine = nLine + 1
-		line := b.Text()
-
-		if r.Match.MatchString(line) {
-			unmatch := false
-			for _, Unmatch := range r.Unmatch {
-				if Unmatch.MatchString(line) {
-					unmatch = true
-				}
+	if r.Match.MatchString(line) {
+		unmatch := false
+		for _, Unmatch := range r.Unmatch {
+			if Unmatch.MatchString(line) {
+				unmatch = true
 			}
+		}
 
-			if !unmatch {
-				results = append(results, RunResult{
-					Line:  line,
-					Nline: nLine,
-				})
-			}
+		if !unmatch {
+			result = true
 		}
 	}
 
-	return results
+	return result
 }

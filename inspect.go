@@ -77,11 +77,11 @@ func inspect_worker(id int, jobs <-chan workerJob, results chan<- workerResult) 
 				nLine = nLine + 1
 				line := fs.Text()
 
-				runResultList := r.Run([]byte(line))
+				runResult := r.Run(line)
 
 				for oi,_ := range job.objectGroup {
-					for _, runResult := range runResultList {
-						secret := models.NewSecret(&job.objectGroup[oi], &job.ruleList[ri], runResult.Nline, runResult.Line)
+					if runResult {
+						secret := models.NewSecret(&job.objectGroup[oi], &job.ruleList[ri], nLine, line)
 						secret.SetException(exceptionCheck(job.exceptionList, *secret))
 						result.secretList = append(result.secretList, *secret)
 					}
