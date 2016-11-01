@@ -11,6 +11,8 @@ import (
 )
 
 type NewObjectSample struct {
+	objType    string
+	objSubtype string
 	name       string
 	expName    string
 	content    []byte
@@ -21,6 +23,8 @@ type NewObjectSample struct {
 func TestNewObject(t *testing.T) {
 	testSamples := []NewObjectSample{
 		{
+			objType:	"type_1",
+			objSubtype:	"subtype_1",
 			name:       "test_1",
 			expName:    "test_1",
 			content:    []byte("content_1"),
@@ -28,6 +32,8 @@ func TestNewObject(t *testing.T) {
 			ok:         true,
 		},
 		{
+			objType:	"type_2",
+			objSubtype:	"subtype_2",
 			name:       "test_2",
 			expName:    "xxx",
 			content:    []byte("content_2"),
@@ -35,6 +41,8 @@ func TestNewObject(t *testing.T) {
 			ok:         false,
 		},
 		{
+			objType:	"type_3",
+			objSubtype:	"subtype_3",
 			name:       "test_3",
 			expName:    "test_3",
 			content:    []byte("content_3"),
@@ -51,7 +59,7 @@ func TestNewObject(t *testing.T) {
 }
 
 func testNewObjectSample(ts NewObjectSample) bool {
-	o := NewObject(ts.name, ts.content)
+	o := NewObject(ts.name, ts.objType, ts.objSubtype, ts.content)
 
 	ok := (o.Name == ts.expName && bytes.Equal(o.Content, ts.expContent))
 
@@ -97,7 +105,7 @@ func TestMetadata(t *testing.T) {
 }
 
 func testMetadataSample(ts MetadataSample) bool {
-	o := NewObject("test", []byte("content"))
+	o := NewObject("test", "type", "subtype", []byte("content"))
 
 	o.SetMetadata(ts.key, ts.value, MetadataAttributes{PrimaryKey: ts.primaryKey})
 	value, err := o.GetMetadata(ts.key)
@@ -191,7 +199,7 @@ func TestPrimaryKeyHash(t *testing.T) {
 }
 
 func testPrimaryKeyHashSample(ts PrimaryKeyHashSample) bool {
-	o := NewObject("test", []byte("content"))
+	o := NewObject("test", "type", "subtype", []byte("content"))
 
 	for k, v := range ts.metadata {
 		o.SetMetadata(k, v.value, v.attr)
