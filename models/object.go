@@ -19,6 +19,9 @@ type KeyHash *[]byte
 
 // Represents an object.
 type Object struct {
+	Type string
+	SubType string
+
 	Name    string
 	Content []byte
 
@@ -40,11 +43,14 @@ type MetadataAttributes struct {
 }
 
 // NewObject creates a new object.
-func NewObject(name string, content []byte) *Object {
+func NewObject(name string, t string, st string, content []byte) *Object {
 	if len(content) > MaxObjectContentLen {
 		content = content[:MaxObjectContentLen]
 	}
 	o := &Object{
+		Type: t,
+		SubType: st,
+
 		Name:    name,
 		Content: content,
 

@@ -14,6 +14,10 @@ import (
 	"os"
 )
 
+const (
+	DefaultCommitCount = 10
+)
+
 var s *seekret.Seekret
 
 func main() {
@@ -71,26 +75,23 @@ func main() {
 			Action:   seekretGit,
 
 			Flags: []cli.Flag{
-				// TODO: To be implemented.
-				/*
-					cli.BoolFlag{
-						Name: "recursive, r",
-					},
-					cli.BoolFlag{
-						Name: "all, a",
-					},
-					cli.StringFlag{
-						Name: "branches, b",
-					},
-				*/
-				cli.IntFlag{
-					Name:  "commit, c",
-					Usage: "inspect commited files. Argument is the number of commits to inspect (0 = all)",
-					Value: 0,
+				cli.BoolFlag{
+					Name:  "commit-files, cf, f",
+					Usage: "inspect commited files",
+				},
+
+				cli.BoolFlag{
+					Name:  "commit-messages, cm, m",
+					Usage: "inspect commit messages",
 				},
 				cli.BoolFlag{
-					Name:  "staged, s",
+					Name:  "staged-files, sf, s",
 					Usage: "inspect staged files",
+				},
+				cli.IntFlag{
+					Name:  "commit-count, cc, c",
+					Usage: "",
+					Value: DefaultCommitCount,
 				},
 			},
 		},
@@ -132,7 +133,6 @@ func seekretBefore(c *cli.Context) error {
 	err = s.LoadExceptionsFromFile(c.String("exception"))
 	if err != nil {
 		return err
-
 	}
 
 	return nil
@@ -165,18 +165,32 @@ func seekretGit(c *cli.Context) error {
 		return nil
 	}
 
+	// SourceGitLoadOptions composition:
+	//   * commit-files: Include commited file content as object.
+	//   * commit-messages: Include commit contect as object.
+	//   * staged-files: Include stateg dile contect as object.
+	//   * commit-count: Ammount of commits to analise.
 	options := map[string]interface{}{
-		"commit": false,
-		"staged": false,
+		"commit-files": false,
+		"commit-messages": false,
+		"staged-files": false,
+		"commit-count": DefaultCommitCount,
 	}
 
-	if c.IsSet("commit") {
-		options["commit"] = true
-		options["commitcount"] = c.Int("commit")
+	if c.IsSet("commit-files") {
+		options["commit-files"] = true
 	}
 
-	if c.IsSet("staged") {
-		options["staged"] = true
+	if c.IsSet("commit-messages") {
+		options["commit-messages"] = true
+	}
+
+	if c.IsSet("staged-files") {
+		options["staged-files"] = true
+	}
+
+	if c.IsSet("commit-count") {
+		options["commit-count"] = c.Int("commit-count")
 	}
 
 	err := s.LoadObjects(sourcegit.SourceTypeGit, source, options)
