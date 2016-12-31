@@ -32,7 +32,7 @@ func FormatOutput(secretList []models.Secret, format string) string {
 func formatOutputHuman(secretList []models.Secret) (string, error) {
 	var out string
 	for _, s := range secretList {
-		out = out + fmt.Sprintf("%s\n\t%d: [%s] %s %s\n", s.Object.Name, s.Nline, s.Rule.Name, s.Line, s.Exception)
+		out = out + fmt.Sprintf("%s\n\t%d: [%s] %s %t\n", s.Object.Name, s.Nline, s.Rule.Name, s.Line, s.Exception)
 	}
 	return out, nil
 }
