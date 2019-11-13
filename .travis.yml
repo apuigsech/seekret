@@ -1,5 +1,7 @@
 language: go
-dist: trusty
+go:
+  - 1.13.3
+dist: bionic
 sudo: required
 
 before_install:
