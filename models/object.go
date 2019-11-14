@@ -7,7 +7,7 @@ package models
 
 import (
 	"fmt"
-	"github.com/codahale/blake2"
+	"golang.org/x/crypto/blake2b"
 	"sort"
 )
 
@@ -68,7 +68,10 @@ func (o *Object) SetMetadata(key string, value string, attr MetadataAttributes) 
 	}
 
 	if attr.PrimaryKey {
-		o.updatePrimaryKeyHash()
+		err := o.updatePrimaryKeyHash()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -99,7 +102,7 @@ func (o *Object) GetPrimaryKeyHash() KeyHash {
 	return o.PrimaryKeyHash
 }
 
-func (o *Object) updatePrimaryKeyHash() {
+func (o *Object) updatePrimaryKeyHash() error {
 	var primayKeyList []string
 	for k, v := range o.Metadata {
 		if v.attr.PrimaryKey {
@@ -114,16 +117,19 @@ func (o *Object) updatePrimaryKeyHash() {
 	}
 	if text == "" {
 		o.PrimaryKeyHash = nil
-		return
+		return nil
 	}
 
-	h := blake2.New(&blake2.Config{
-		Size: 32,
-	})
+	h, err := blake2b.New(32, nil)
+	if err != nil {
+		return err
+	}
 	h.Write([]byte(text))
 
-	primayKeyHask := h.Sum(nil)
-	o.PrimaryKeyHash = &primayKeyHask
+	primayKeyHash := h.Sum(nil)
+	o.PrimaryKeyHash = &primayKeyHash
+
+	return nil
 }
 
 func GroupObjectsByMetadata(objects []Object, k string) map[string][]Object {
