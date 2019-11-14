@@ -1,4 +1,4 @@
-module github.com/gguillemas/seekret
+module github.com/apuigsech/seekret
 
 go 1.13
 
